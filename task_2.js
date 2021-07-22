@@ -1,14 +1,11 @@
-
-//аргументом передаем старртовое значение
-
-let numHandler = function (num) {
+let handleNum  = function (num) {
 
   let startValue = num;
   let sumValue = 2;
 
   return function () {
 
-    if (startValue % 5 === 0 & !(startValue === 0)) {
+    if (startValue % 5 === 0 && !(startValue === 0)) {
 
       sumValue = 3;
       startValue /= 5;
@@ -16,7 +13,7 @@ let numHandler = function (num) {
       return startValue;
     }
 
-      if (startValue % 7 === 0 & !(startValue === 0)) {
+      if (startValue % 7 === 0 && !(startValue === 0)) {
 
         sumValue = 1;
         startValue -= 7;
@@ -27,9 +24,14 @@ let numHandler = function (num) {
   }
 }
 
-for (let i = 1 ;i < 20 ; i++){
-  let someValue = Math.floor(Math.random()*10)+1;
-  console.log(`
-    Вызванно с аргументом ${someValue}
-    возращаемое значение ${numHandler(someValue)()}`);
+
+
+function test() {
+  let func = handleNum (0)
+  for (var i = 0; i < 20; i++) {
+
+    console.log(func());
+  }
 }
+
+test();
