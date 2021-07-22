@@ -11,6 +11,7 @@ function setStability(num) {
 }
 
 function setDifficulty(nameMode) {
+  
   let num;
 
   if (nameMode === 'beginner') {
