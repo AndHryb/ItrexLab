@@ -1,37 +1,25 @@
-function setABS(num) {
-  console.log(`ABS:${num}`)
-}
 
-function setTraction(num) {
-  console.log(`Traction Control:${num}`)
-}
 
-function setStability(num) {
-  console.log(`Stability Control:${num}`)
-}
+ function bulbInverter(blubs,invertions){
 
-function setDifficulty(nameMode) {
-  let num;
+    let blubsArr = new Array();
+    let invertionsData = invertions;
+    let counter = 0;
 
-  if (nameMode === 'beginner') {
-    num = 5;
-  }
+    for (let i =0;i<blubs;i++){
+        blubsArr[i]= false;
+    }
 
-  if (nameMode === 'god_driver') {
-    num = 3;
-  }
-  if (nameMode === 'maniac') {
-    num = 1;
-  }
+    function setInvertions(elem,i){
+        for (let j =(elem-1);j<blubsArr.length;j+=elem){
+            blubsArr[j] =  !blubsArr[j] ;
+        }
+    }
 
-  setABS(num)
-  setTraction(num)
-  setStability(num)
+    invertionsData.forEach(setInvertions);
+    blubsArr.forEach((elem)=> {if(elem){counter++}})
 
-}
-console.log('сложновть beginner');
-setDifficulty('beginner');
-console.log('сложновть god_driver');
-setDifficulty('god_driver');
-console.log('сложновть maniac');
-setDifficulty('maniac');
+     return counter;
+
+ }
+ bulbInverter(172, [19,2,7,13,40,23,16,1,45,9]);
