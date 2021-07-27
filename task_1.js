@@ -1,25 +1,23 @@
+function bulbInverter(blubs,invertions){
 
+   let blubsArr = [];
+   let invertionsData = invertions;
+   let counter = 0;
 
- function bulbInverter(blubs,invertions){
+   for (let i =0; i<blubs; i++){
+       blubsArr[i]= false;
+   }
 
-    let blubsArr = new Array();
-    let invertionsData = invertions;
-    let counter = 0;
+   function setInvertions(elem,i){
+       for (let j =(elem-1);j<blubsArr.length;j+=elem){
+           blubsArr[j] =  !blubsArr[j] ;
+       }
+   }
 
-    for (let i =0;i<blubs;i++){
-        blubsArr[i]= false;
-    }
+   invertionsData.forEach(setInvertions);
+   blubsArr.forEach((elem)=> {if(elem){counter++}})
 
-    function setInvertions(elem,i){
-        for (let j =(elem-1);j<blubsArr.length;j+=elem){
-            blubsArr[j] =  !blubsArr[j] ;
-        }
-    }
+    return counter;
 
-    invertionsData.forEach(setInvertions);
-    blubsArr.forEach((elem)=> {if(elem){counter++}})
-
-     return counter;
-
- }
- bulbInverter(172, [19,2,7,13,40,23,16,1,45,9]);
+}
+bulbInverter(172, [19,2,7,13,40,23,16,1,45,9]);
