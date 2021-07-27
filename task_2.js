@@ -6,42 +6,34 @@ function dispenseChapter(chapterArr,amountOfVolume){
 
     let chapters = chapterArr;
 
-    let volumes = amountOfVolume;
 
-    let volumesData = [];
+    function sumMinNeighbors(arr){
+        let arrForProcessing = arr;
+        let minSum = arrForProcessing[0] + arrForProcessing[1] ;
+        let numFirstNeighbour = 0;
+        let numSecondNeighbour = 1;
 
-
-    function minSumNeighbors(arr){
-        let minSum = chapterArr[0]+chapterArr[1] ;
-        let numChapters;
-        for (let i = 1;i<chapterArr.length;i++){
-            let curSum = chapterArr[i-1]+chapterArr[i];
+        for (let i = 1; i<arrForProcessing.length; i++){
+            let curSum = arrForProcessing[i]+arrForProcessing[i+1];
             if(curSum<minSum){
                 minSum = curSum;
-
+                numFirstNeighbour = i;
+                numSecondNeighbour = i+1;
             }
-            numChapters = [i-1,i];
         }
-        return {sum:minSum,neighborsChapters:numChapters}
-
+        arrForProcessing[numFirstNeighbour] = minSum;
+        arrForProcessing.splice(numSecondNeighbour,1);
+        return arrForProcessing
     }
 
-    while (chapters.length>volumes){
-        let minSumData = minSumNeighbors(chapters);
+    while (chapters.length>amountOfVolume){
 
-        chapters.splice(minSumData.neighborsChapters[0],minSumData.neighborsChapters.length);
+        chapters = sumMinNeighbors(chapters);
 
-        volumesData.push(minSumData.sum);
-        volumes--;
     }
-
-    if(chapters.length = volumes){
-        for(let i =0;i<chapters.length;i++){
-            volumesData.push(chapters[i])
-        }
-    }
-    return Math.max(...volumesData)
+    return Math.max(...chapters)
 }
 
 console.log(dispenseChapter([1,2,1],2));//3
-console.log(dispenseChapter([1,2,1,1],3));
+
+console.log(dispenseChapter([1,2,1,1],3));//2
