@@ -1,17 +1,33 @@
-function crasher(a) {
-  delete a.bla;
+
+function calculateTime(n,x,y){
+
+    let numberOfCopies = n;
+    let spentSeconds = 0;
+
+    if(x>y){
+        spentSeconds += y;
+        numberOfCopies--;
+    }else if(y>x){
+        spentSeconds +=x;
+        numberOfCopies--;
+    }else {
+        spentSeconds +=x;
+        numberOfCopies--;
+    }
+
+    while(numberOfCopies>0){
+
+          spentSeconds++
+
+        if(spentSeconds % x === 0 ){
+            numberOfCopies --;
+        }
+        if(spentSeconds%y === 0 ){
+            numberOfCopies --;
+        }
+    }
+    return spentSeconds;
 }
 
-const a = {
-  bla: 'bla',
-};
 
-// начало блока изменений
-function createScope() {
-  let a ={};
-  crasher(a);
-}
-
-// конец блока изменений
-
-console.log(a);
+console.log(calculateTime(4,1,1));
