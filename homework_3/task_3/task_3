@@ -1,8 +1,0 @@
-const fetch = require('node-fetch');
-console.log('hhhhhhhhhhhhhhh');
-
-async function hhh(){
-    let data = await  fetch(`https://randomuser.me/api/ ? results = 5`)
-    console.log(data)
-}
-hhh();
