@@ -11,8 +11,6 @@ const app = express();
 const __dirname = path.resolve();
 
 app.use(express.static(path.resolve(__dirname, 'static')));
-//app.use(express.urlencoded({extended: false}));
-//app.use(express.json());
 app.use(bodyParser.json({ strict: false }));
 
 app.use(doctorRouter);

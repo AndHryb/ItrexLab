@@ -1,9 +1,6 @@
-import { resolutionDS } from '../model/data_store.js';
-import { PatientQueue } from '../model/queue.js';
-import Request from '../support/request.js';
-
-resolutionDS.add('Andrei', 'bla bla bla');
-console.log(resolutionDS.data);
+import { resolutionDS } from '../storage/data_store.js';
+import { PatientQueue } from '../storage/queue.js';
+import Request from '../helpers/request.js';
 
 export function getResolution(reqBody) {
   const res = new Request();
@@ -36,7 +33,7 @@ export function addResolution(reqBody) {
   res.value = resolutionDS.add(nextInQueuePatientName, reqBody);
   return res;
 }
-export function  deleteResolution(reqBody){
+export function deleteResolution(reqBody) {
   const res = new Request();
   if (!(reqBody === 0)) { res.status = 200; }
   if (reqBody === 0) { res.status = 400; }
