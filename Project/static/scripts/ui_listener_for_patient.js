@@ -1,3 +1,5 @@
+import createReq from "./http-req.js";
+
 const displayPatientName = document.getElementById('display_patient_name');
 const inputForPatientName = document.getElementById('enter_patient_name');
 const patientInputValidation = document.getElementById('patient_input_validation');
@@ -5,20 +7,12 @@ const addBtnForPatientName = document.getElementById('add_patient_name');
 const searchForPatientName = document.getElementById('search_for_patient');
 const textAreaForPatient = document.getElementById('resolution_for_patient');
 
-async function createPostReq(url, body) {
-  return fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8',
-    },
-    body: JSON.stringify(body),
-  });
-}
+
 
 addBtnForPatientName.addEventListener('click', async () => {
   try {
     console.log(inputForPatientName.value);
-    const response = await createPostReq('/add_patient', inputForPatientName.value);
+    const response = await createReq('/in_queue', inputForPatientName.value, 'PUT');
     const data = await response.json();
     console.log(data);
   } catch (err) {
@@ -43,7 +37,7 @@ searchForPatientName.addEventListener('change', async () => {
   }
   try {
     console.log(searchForPatientName.value);
-    const response = await createPostReq('/get_resolution_patient', searchForPatientName.value);
+    const response = await fetch(`/resolution_patient?name=${searchForPatientName.value}`);
     console.log(response);
     const data = await response.json();
     textAreaForPatient.value = data;

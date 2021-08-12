@@ -1,3 +1,5 @@
+import createReq from "./http-req.js";
+
 const displayPatientNameForDoctor = document.getElementById('display_patient_name_for_doctor');
 const nextBtnForDoctor = document.getElementById('next_btn');
 
@@ -8,16 +10,6 @@ const inputForSearchResolution = document.getElementById('show_resolution_input'
 const showResolutionBtn = document.getElementById('show_resolution_btn');
 const textAreaForResolution = document.getElementById('text_area_for_doctor_resolution');
 const deleteResolutionBtn = document.getElementById('del_resolution_btn');
-
-async function createPostReq(url, body) {
-  return fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8',
-    },
-    body: JSON.stringify(body),
-  });
-}
 
 nextBtnForDoctor.addEventListener('click', async () => {
   try {
@@ -30,7 +22,7 @@ nextBtnForDoctor.addEventListener('click', async () => {
 
 addBtnForResolution.addEventListener('click', async () => {
   try {
-    const response = await createPostReq('/add_resolution', doctorResolution.value);
+    const response = await createReq('/resolution', doctorResolution.value, 'PUT');
     console.log(response);
     const data = await response.json();
     console.log(data);
@@ -43,7 +35,7 @@ addBtnForResolution.addEventListener('click', async () => {
 
 showResolutionBtn.addEventListener('click', async () => {
   try {
-    const response = await createPostReq('/show_resolution', inputForSearchResolution.value);
+    const response = await fetch(`/resolution_patient?name=${inputForSearchResolution.value}`);
     const data = await response.json();
     console.log(data);
     textAreaForResolution.value = data;
@@ -54,13 +46,13 @@ showResolutionBtn.addEventListener('click', async () => {
 deleteResolutionBtn.addEventListener('click', async () => {
   try {
     console.log(inputForSearchResolution.value);
-    const response = await createPostReq('/delete_resolution', inputForSearchResolution.value);
+    const response = await createReq('/resolution', inputForSearchResolution.value, 'DELETE');
     const data = await response.json();
     console.log(data);
     textAreaForResolution.value = data;
     setTimeout(() => {
       textAreaForResolution.value = '';
-    }, 3000);
+    }, 500);
   } catch (err) {
     console.log('Request failed', err);
   }

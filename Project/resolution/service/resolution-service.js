@@ -8,7 +8,7 @@ export default class DataStore {
     this.data[key] = {};
     this.data[key].resolution = val;
     this.data[key].regTime = (new Date()).getTime();
-    return `resolution for ${key} added`;
+    return true;
   }
 
   get(key) {
@@ -28,7 +28,7 @@ export default class DataStore {
 
   remove(key) {
     delete this.data[key];
-    return `${key} resolution deleted`;
+    return true;
   }
 }
 
