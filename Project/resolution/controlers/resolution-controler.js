@@ -6,14 +6,24 @@ import { STATUSES } from '../../constants/STATUSES.js';
 class ResolutionControler {
   getResolution(reqBody) {
     const res = new Request();
-    if (!(reqBody in resolutionDS.data)) {
+    const result = resolutionDS.get(reqBody);
+    console.log(result);
+
+    if (!(result)) {
       res.status = 400;
       res.value = `The patient ${reqBody} not found in the database`;
+      return res;
+    }
+
+    if (resolutionDS.TTL <= (new Date()).getTime() - result.regTime) {
+      res.status = 200;
+      res.value = `The resolution for patient ${reqBody} has expired`;
 
       return res;
     }
+
     res.status = 200;
-    res.value = resolutionDS.get(reqBody);
+    res.value = result.resolution;
 
     return res;
   }
