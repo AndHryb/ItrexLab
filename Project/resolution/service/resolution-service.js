@@ -1,32 +1,33 @@
-export default class DataStore {
-  constructor(TTL) {
-    this.data = {};
-    this.TTL = TTL;
+export default class ResolutionService {
+  constructor(resolutionDS) {
+    this.DS = resolutionDS;
   }
 
-  add(key, val) {
-    this.data[key] = {};
-    this.data[key].resolution = val;
-    this.data[key].regTime = (new Date()).getTime();
-    return true;
-  }
+  async add(key, val) {
+    try {
+      const result = await this.DS.add(key, val);
 
-  get(key) {
-    if (!(key in this.data)) {
-      return false;
+      return result;
+    } catch (err) {
+      console.log(`Resolution service add error :${err.name} : ${err.message}`);
     }
-    return this.data[key];
   }
 
-  getAll() {
-    return this.data;
+  async get(key) {
+    try {
+      const result = await this.DS.get(key);
+      return result;
+    } catch (err) {
+      console.log(`Resolution service get error :${err.name} : ${err.message}`);
+    }
   }
 
-  remove(key) {
-    delete this.data[key];
-    return true;
+  async delete(key) {
+    try {
+      const result = await this.DS.delete(key);
+      return result;
+    } catch (err) {
+      console.log(`Resolution service delete error :${err.name} : ${err.message}`);
+    }
   }
 }
-
-const resolutionDS = new DataStore(10000); // TTL  10 sec
-export { resolutionDS };

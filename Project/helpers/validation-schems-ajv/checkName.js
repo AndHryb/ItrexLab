@@ -1,4 +1,4 @@
-import { MAX_LENGTH, MIN_LENGTH } from '../../constants/LENGTH.js';
+import { MAX_LENGTH, MIN_LENGTH } from '../../constants.js';
 
 export const checkNameSchema = {
   type: 'string',

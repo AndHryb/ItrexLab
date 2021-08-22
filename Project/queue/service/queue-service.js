@@ -1,29 +1,39 @@
-class QueueService {
-  constructor() {
-    this.queue = [];
+export default class QueueService {
+  constructor(storage) {
+    this.queue = storage;
   }
 
-  get() {
-    if (this.queue.length === 0) {
-      return false;
+  async get() {
+    try {
+      const result = await this.queue.get();
+      return result;
+    } catch (err) {
+      console.log(`QueueServise get error : ${err.name} : ${err.message}`);
     }
-    return this.queue[this.queue.length - 1];
   }
 
-  add(name) {
-    if (this.queue.indexOf(name) !== -1) {
-      return false;
+  async add(name) {
+    try {
+      const result = await this.queue.add(name);
+      return result;
+    } catch (err) {
+      console.log(`QueueServise add error : ${err.name} : ${err.message}`);
     }
-    this.queue.unshift(name);
-    return true;
   }
 
-  remove() {
-    if (this.queue.length === 0) {
-      return 'The queue is empty';
+  async delete() {
+    try {
+      return await this.queue.delete();
+    } catch (err) {
+      console.log(`QueueServise delete error : ${err.name} : ${err.message}`);
     }
-    return this.queue.pop();
+  }
+
+  async getLength() {
+    try {
+      return await this.queue.getLength();
+    } catch (err) {
+      console.log(`QueueServise getLength error : ${err.name} : ${err.message}`);
+    }
   }
 }
-const PatientQueue = new QueueService();
-export { PatientQueue };

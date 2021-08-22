@@ -22,7 +22,7 @@ nextBtnForDoctor.addEventListener('click', async () => {
 
 addBtnForResolution.addEventListener('click', async () => {
   try {
-    const response = await createReq('/resolution', doctorResolution.value, 'PUT');
+    const response = await createReq('/resolution', doctorResolution.value, 'POST');
     console.log(response);
     const data = await response.json();
     console.log(data);
@@ -35,7 +35,7 @@ addBtnForResolution.addEventListener('click', async () => {
 
 showResolutionBtn.addEventListener('click', async () => {
   try {
-    const response = await fetch(`/resolution_patient?name=${inputForSearchResolution.value}`);
+    const response = await fetch(`/resolution_patient/${inputForSearchResolution.value}`);
     const data = await response.json();
     console.log(data);
     textAreaForResolution.value = data;
@@ -47,12 +47,13 @@ deleteResolutionBtn.addEventListener('click', async () => {
   try {
     console.log(inputForSearchResolution.value);
     const response = await createReq('/resolution', inputForSearchResolution.value, 'DELETE');
+    console.log(response);
     const data = await response.json();
     console.log(data);
     textAreaForResolution.value = data;
     setTimeout(() => {
       textAreaForResolution.value = '';
-    }, 500);
+    }, 1000);
   } catch (err) {
     console.log('Request failed', err);
   }
