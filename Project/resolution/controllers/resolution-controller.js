@@ -2,49 +2,71 @@ import { STATUSES } from '../../constants.js';
 import Request from '../../helpers/request.js';
 
 export default class ResolutionController {
-  constructor(queueStorage, resolutionStorage, TTL) {
-    this.queueStorage = queueStorage;
-    this.resolutionStorage = resolutionStorage;
+  constructor(queueService, resolutionService, patientService, TTL) {
+    this.queueService = queueService;
+    this.resolutionService = resolutionService;
+    this.patientService = patientService;
     this.TTL = TTL;
   }
 
-  async getResolution(reqBody) {
+  async getResolutionsByName(reqBody) {
     const res = new Request();
-    const result = await this.resolutionStorage.get(reqBody);
+    const patientsList = await this.patientService.getByName(reqBody);
+    console.log('listlengt');
+    console.log(patientsList);
 
-    if (!(result)) {
-      res.status = STATUSES.BadRequest;
+    if (patientsList.length === 0) {
+      res.status = STATUSES.NotFound;
       res.value = `The patient ${reqBody} not found in the database`;
 
       return res;
     }
 
-    if (this.TTL <= (new Date()).getTime() - result.regTime) {
-      res.status = STATUSES.Forbidden;
-      res.value = `The resolution for patient ${reqBody} has expired`;
+    res.value = [];
 
-      return res;
+    for (const elem of patientsList) {
+      const result = await this.resolutionService.getById(elem.resolutionId);
+      console.log(result.regTime);
+      console.log(this.TTL);
+
+      if (this.TTL < (new Date()).getTime() - result.regTime) {
+        console.log(`time  ${this.TTL}` < (new Date()).getTime() - result.regTime);
+        result.resolution = `The resolution for patient ${elem.name} has expired`;
+      }
+
+      if (result.resolution) {
+        res.value.push({
+          name: elem.name,
+          id: elem.resolutionId,
+          resolution: result.resolution,
+          regTime: elem.regTime,
+        });
+      }
     }
 
     res.status = STATUSES.OK;
-    res.value = result.resolution;
 
     return res;
   }
 
   async addResolution(reqBody) {
     const res = new Request();
-    const queueLength = await this.queueStorage.getLength();
+    const queueLength = await this.queueService.getLength();
+
     if (queueLength === 0) {
       res.status = STATUSES.PreconditionFailed;
-      res.value = 'Can\'t added resolution. There is no one in the queue';
+      res.value = 'Can\'t added resolution. There is no one in the queueRepository';
 
       return res;
     }
-    const nextInQueuePatientName = await this.queueStorage.delete();
-    const result = await this.resolutionStorage.add(nextInQueuePatientName, reqBody);
+
+    const nextInQueuePatientName = await this.queueService.delete();
+    const result = await this.resolutionService.add(nextInQueuePatientName, reqBody);
+    await this.patientService.setResolutionID(nextInQueuePatientName, result);
+    const patientData = await this.patientService.getById(nextInQueuePatientName);
+
     if (result) {
-      res.value = `Added resolution for ${nextInQueuePatientName}`;
+      res.value = `Added resolution for ${patientData.name}`;
       res.status = STATUSES.OK;
     }
 
@@ -53,18 +75,16 @@ export default class ResolutionController {
 
   async deleteResolution(reqBody) {
     const res = new Request();
-    const result = await this.resolutionStorage.delete(reqBody);
+    const result = await this.resolutionService.delete(reqBody);
 
     if (!(result)) {
-      res.status = STATUSES.BadRequest;
-      res.value = `The patient ${reqBody} not found in the database`;
+      res.status = STATUSES.NotFound;
+      res.value = `The resolution ${reqBody} not found in the database`;
 
       return res;
     }
-    console.log(typeof reqBody);
-
     res.status = STATUSES.OK;
-    res.value = `The resolution for patient ${reqBody} deleted`;
+    res.value = `The resolution  ${reqBody} deleted`;
 
     return res;
   }

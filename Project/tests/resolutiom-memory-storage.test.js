@@ -1,4 +1,4 @@
-import { resolutionMemoryStorage } from '../resolution/storages/resolution-memory-storage.js';
+import { resolutionInmemoryRepository } from '../resolution/repository/resolution-inmemory-repository.js';
 
 describe('resolution servise unit test', () => {
   let resolutionData;
@@ -14,42 +14,42 @@ describe('resolution servise unit test', () => {
   });
 
   test('get resolution data(storage has data)', () => {
-    resolutionMemoryStorage.data = resolutionData;
-    const res = resolutionMemoryStorage.get(resolutionKey);
+    resolutionInmemoryRepository.data = resolutionData;
+    const res = resolutionInmemoryRepository.get(resolutionKey);
     expect(res).toEqual(resolutionData[resolutionKey]);
   });
 
   test('get resolution data(storage has data,data hasn\'t key)', () => {
-    resolutionMemoryStorage.data = resolutionData;
-    const res = resolutionMemoryStorage.get('Elena');
+    resolutionInmemoryRepository.data = resolutionData;
+    const res = resolutionInmemoryRepository.get('Elena');
     expect(res).toEqual(false);
   });
 
   test('get resolution data(storage hasn\'t data)', () => {
-    resolutionMemoryStorage.data = {};
-    const res = resolutionMemoryStorage.get(resolutionKey);
+    resolutionInmemoryRepository.data = {};
+    const res = resolutionInmemoryRepository.get(resolutionKey);
     expect(res).toEqual(false);
   });
 
   test('add resolution data', () => {
-    resolutionMemoryStorage.data = {};
-    const res = resolutionMemoryStorage.add(resolutionKey, resolutionVal);
+    resolutionInmemoryRepository.data = {};
+    const res = resolutionInmemoryRepository.add(resolutionKey, resolutionVal);
     expect(res).toEqual(true);
-    expect(resolutionMemoryStorage.data[resolutionKey].name).toEqual(resolutionKey);
-    expect(resolutionMemoryStorage.data[resolutionKey].resolution).toEqual(resolutionVal);
-    expect(resolutionMemoryStorage.data[resolutionKey].regTime).toBeLessThanOrEqual((new Date()).getTime());
+    expect(resolutionInmemoryRepository.data[resolutionKey].name).toEqual(resolutionKey);
+    expect(resolutionInmemoryRepository.data[resolutionKey].resolution).toEqual(resolutionVal);
+    expect(resolutionInmemoryRepository.data[resolutionKey].regTime).toBeLessThanOrEqual((new Date()).getTime());
   });
 
   test('delete resolution data(storage has data)', () => {
-    resolutionMemoryStorage.data = resolutionData;
-    const res = resolutionMemoryStorage.delete(resolutionKey);
+    resolutionInmemoryRepository.data = resolutionData;
+    const res = resolutionInmemoryRepository.delete(resolutionKey);
     expect(res).toEqual(true);
     expect(resolutionKey in resolutionData).toEqual(false);
   });
 
   test('delete resolution data(storage hasn\'t data)', () => {
-    resolutionMemoryStorage.data = {};
-    const res = resolutionMemoryStorage.delete(resolutionKey);
+    resolutionInmemoryRepository.data = {};
+    const res = resolutionInmemoryRepository.delete(resolutionKey);
     expect(res).toEqual(false);
   });
 });

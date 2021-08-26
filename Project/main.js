@@ -3,9 +3,8 @@ import path from 'path';
 import bodyParser from 'body-parser';
 import doctorRouter from './resolution/routes/resolution-router.js';
 import patientRouter from './queue/routes/queue-router.js';
-import {envConfig} from "./config.js";
+import { envConfig } from './config.js';
 
-const PORT = 3000;
 const app = express();
 const __dirname = path.resolve();
 

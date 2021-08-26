@@ -1,11 +1,11 @@
 export default class ResolutionService {
-  constructor(resolutionDS) {
-    this.DS = resolutionDS;
+  constructor(resolutionRepository) {
+    this.resolutionRepository = resolutionRepository;
   }
 
-  async add(key, val) {
+  async add(patientId, resolution) {
     try {
-      const result = await this.DS.add(key, val);
+      const result = await this.resolutionRepository.add(patientId, resolution);
 
       return result;
     } catch (err) {
@@ -13,18 +13,19 @@ export default class ResolutionService {
     }
   }
 
-  async get(key) {
+  async getById(resolutionId) {
     try {
-      const result = await this.DS.get(key);
-      return result;
+      return await this.resolutionRepository.getById(resolutionId);
     } catch (err) {
       console.log(`Resolution service get error :${err.name} : ${err.message}`);
     }
   }
 
-  async delete(key) {
+  async delete(resolutionId) {
     try {
-      const result = await this.DS.delete(key);
+      const result = await this.resolutionRepository.delete(resolutionId);
+      console.log('del result>>>>')
+      console.log(result);
       return result;
     } catch (err) {
       console.log(`Resolution service delete error :${err.name} : ${err.message}`);

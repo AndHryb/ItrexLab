@@ -1,4 +1,4 @@
-class QueueMemoryStorage {
+class QueueInmemoryRepository {
   constructor() {
     this.queue = [];
   }
@@ -10,8 +10,8 @@ class QueueMemoryStorage {
     return this.queue[0];
   }
 
-  add(name) {
-    this.queue.push(name);
+  add(patientId) {
+    this.queue.push(patientId);
     return this.queue[this.queue.length - 1];
   }
 
@@ -19,12 +19,12 @@ class QueueMemoryStorage {
     if (this.queue.length === 0) {
       return false;
     }
-    return this.queue.shift();
+    return this.queue.shift(); // Во всех сервисах необходимо возратить!!!
   }
 
   getLength() {
     return this.queue.length;
   }
 }
-const queueMemoryStorage = new QueueMemoryStorage();
-export { queueMemoryStorage };
+const queueInmemoryRepository = new QueueInmemoryRepository();
+export { queueInmemoryRepository };

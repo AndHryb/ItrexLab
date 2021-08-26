@@ -63,7 +63,7 @@ header{
 .resolution_search{
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     width: 30%;
     padding: 1em;
 }

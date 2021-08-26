@@ -1,6 +1,6 @@
-import { queueMemoryStorage } from '../queue/storages/queue-memory-storage.js';
+import { queueInmemoryRepository } from '../queue/repository/queue-inmemory-repository.js';
 
-describe('queue service unit tests', () => {
+describe('queueRepository service unit tests', () => {
   let queueTestArr;
 
   beforeEach(() => {
@@ -8,44 +8,44 @@ describe('queue service unit tests', () => {
   });
 
   test('method add', () => {
-    const res = queueMemoryStorage.add(queueTestArr[0]);
+    const res = queueInmemoryRepository.add(queueTestArr[0]);
     expect(res).toEqual(queueTestArr[0]);
   });
 
   test('method get', () => {
-    queueMemoryStorage.queue = queueTestArr;
-    const res = queueMemoryStorage.get();
+    queueInmemoryRepository.queue = queueTestArr;
+    const res = queueInmemoryRepository.get();
     expect(res).toEqual(queueTestArr[0]);
   });
 
-  test('method get(queue is empty)', () => {
-    queueMemoryStorage.queue = [];
-    const res = queueMemoryStorage.get();
+  test('method get(queueRepository is empty)', () => {
+    queueInmemoryRepository.queue = [];
+    const res = queueInmemoryRepository.get();
     expect(res).toEqual(false);
   });
 
   test('method delete', () => {
     const firstElem = queueTestArr[0];
-    queueMemoryStorage.queue = queueTestArr;
-    const res = queueMemoryStorage.delete();
+    queueInmemoryRepository.queue = queueTestArr;
+    const res = queueInmemoryRepository.delete();
     expect(res).toEqual(firstElem);
   });
 
-  test('method delete(queue is empty)', () => {
-    queueMemoryStorage.queue =[];
-    const res = queueMemoryStorage.delete();
+  test('method delete(queueRepository is empty)', () => {
+    queueInmemoryRepository.queue =[];
+    const res = queueInmemoryRepository.delete();
     expect(res).toEqual(false);
   });
 
   test('method getLength', () => {
-    queueMemoryStorage.queue = queueTestArr;
-    const res = queueMemoryStorage.getLength();
+    queueInmemoryRepository.queue = queueTestArr;
+    const res = queueInmemoryRepository.getLength();
     expect(res).toEqual(3);
   });
 
-  test('method getLength(queue is empty)', () => {
-    queueMemoryStorage.queue = [];
-    const res = queueMemoryStorage.getLength();
+  test('method getLength(queueRepository is empty)', () => {
+    queueInmemoryRepository.queue = [];
+    const res = queueInmemoryRepository.getLength();
     expect(res).toEqual(0);
   });
 });
