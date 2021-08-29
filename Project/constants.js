@@ -15,3 +15,4 @@ export const STATUSES = {
   Unavailable: 503,
 };
 
+export const { TTL } = process.env;

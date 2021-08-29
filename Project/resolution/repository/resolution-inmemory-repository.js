@@ -23,6 +23,27 @@ class ResolutionInmemoryRepository {
     return this.data[resolutionId];
   }
 
+  getByPatientId(patientId) {
+    const keys = Object.keys(this.data);
+    let result;
+    keys.forEach((elem) => {
+      if (this.data[elem].patientId === patientId) {
+        result = {
+          resolutionId: elem,
+          patientId,
+          resolution: this.data[elem].resolution,
+          regTime: this.data[elem].regTime,
+        };
+      }
+    });
+
+    if (!result) {
+      return false;
+    }
+
+    return result;
+  }
+
   delete(resolutionId) {
     return delete this.data[resolutionId];
   }

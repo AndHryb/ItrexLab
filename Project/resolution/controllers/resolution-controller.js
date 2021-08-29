@@ -12,8 +12,6 @@ export default class ResolutionController {
   async getResolutionsByName(reqBody) {
     const res = new Request();
     const patientsList = await this.patientService.getByName(reqBody);
-    console.log('listlengt');
-    console.log(patientsList);
 
     if (patientsList.length === 0) {
       res.status = STATUSES.NotFound;
@@ -25,9 +23,10 @@ export default class ResolutionController {
     res.value = [];
 
     for (const elem of patientsList) {
-      const result = await this.resolutionService.getById(elem.resolutionId);
-      console.log(result.regTime);
-      console.log(this.TTL);
+      const result = await this.resolutionService.getByPatientId(elem.patientId);
+      if (!result) {
+        continue;
+      }
 
       if (this.TTL < (new Date()).getTime() - result.regTime) {
         console.log(`time  ${this.TTL}` < (new Date()).getTime() - result.regTime);
@@ -37,7 +36,7 @@ export default class ResolutionController {
       if (result.resolution) {
         res.value.push({
           name: elem.name,
-          id: elem.resolutionId,
+          id: result.resolutionId,
           resolution: result.resolution,
           regTime: elem.regTime,
         });
@@ -45,6 +44,11 @@ export default class ResolutionController {
     }
 
     res.status = STATUSES.OK;
+
+    if (res.value.length === 0) {
+      res.status = STATUSES.NotFound;
+      res.value = `The resolutions for patients whose name is ${reqBody} not found in the database`;
+    }
 
     return res;
   }
@@ -62,12 +66,11 @@ export default class ResolutionController {
 
     const nextInQueuePatientName = await this.queueService.delete();
     const result = await this.resolutionService.add(nextInQueuePatientName, reqBody);
-    await this.patientService.setResolutionID(nextInQueuePatientName, result);
     const patientData = await this.patientService.getById(nextInQueuePatientName);
 
     if (result) {
       res.value = `Added resolution for ${patientData.name}`;
-      res.status = STATUSES.OK;
+      res.status = STATUSES.Created;
     }
 
     return res;

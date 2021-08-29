@@ -8,7 +8,7 @@ export default class QueueController {
 
   async addToQueue(reqBody) {
     const res = new Request();
-    res.status = STATUSES.OK;
+    res.status = STATUSES.Created;
     const result = await this.queueService.add(reqBody);
     if (result) {
       res.value = `patient ${result} added to the queue`;

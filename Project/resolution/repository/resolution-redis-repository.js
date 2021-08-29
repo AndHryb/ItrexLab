@@ -32,11 +32,43 @@ export default class ResolutionRedisRepository {
     return JSON.parse(result);
   }
 
+  async getByPatientId(patientId) {
+    const getKeys = promisify(this.client.hkeys).bind(this.client);
+    const keys = await getKeys(this.DS);
+
+    let resultData;
+
+    for (const elem of keys) {
+      const getValue = promisify(this.client.hget).bind(this.client);
+      const result = JSON.parse(await getValue(this.DS, elem));
+
+      if (result.patientId === patientId) {
+        console.log('set data');
+        resultData = {
+          resolutionId: elem,
+          patientId: result.patientId,
+          resolution: result.resolution,
+          regTime: result.regTime,
+        };
+      }
+    }
+
+    if (!resultData) {
+      return false;
+    }
+    console.log('resultData>>>');
+    console.log(resultData);
+
+    return resultData;
+  }
+
   async delete(resolutionId) {
     const result = this.getById(resolutionId);
     const deleteValue = promisify(this.client.hdel).bind(this.client);
-    await deleteValue(this.DS, resolutionId);
-
-    return result;
+    const delResult = await deleteValue(this.DS, resolutionId);
+    if (delResult) {
+      return result;
+    }
+    return false;
   }
 }

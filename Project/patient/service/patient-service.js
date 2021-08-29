@@ -4,22 +4,13 @@ export default class PatientService {
     this.resolutionRepository = resolutionRepository;
   }
 
-  async add(name, resolutionID) {
+  async add(name) {
     try {
-      const result = await this.patientRepository.add(name, resolutionID);
+      const result = await this.patientRepository.add(name);
 
       return result;
     } catch (err) {
       console.log(`Patient service add error :${err.name} : ${err.message}`);
-    }
-  }
-
-  async setResolutionID(patientId, resolutionId) {
-    try {
-      const result = await this.patientRepository.setResolutionID(patientId, resolutionId);
-      return result;
-    } catch (err) {
-      console.log(`Patient service setResolutionID error :${err.name} : ${err.message}`);
     }
   }
 
@@ -44,6 +35,8 @@ export default class PatientService {
   async delete(patientId) {
     try {
       const result = await this.patientRepository.delete(patientId);
+      const resolutionData = await this.resolutionRepository.getByPatientId(patientId);
+      await this.resolutionRepository.delete(resolutionData.resolutionId)
       return result;
     } catch (err) {
       console.log(`Resolution service delete error :${err.name} : ${err.message}`);

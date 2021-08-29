@@ -14,19 +14,24 @@ const deleteResolutionID = document.getElementById('del_resolution_id');
 
 nextBtnForDoctor.addEventListener('click', async () => {
   try {
-    const response = await fetch('/next_in_queue');
-    displayPatientNameForDoctor.textContent = await response.json();
+    const response = await fetch('/doctor/next_in_queue');
+    const data = await response.json();
+    displayPatientNameForDoctor.textContent = data;
   } catch (err) {
     console.log('Request failed', err);
   }
 });
 
 addBtnForResolution.addEventListener('click', async () => {
+  if(displayPatientNameForDoctor.textContent === ''||doctorResolution.value === ''){
+    return false;
+  }
   try {
-    const response = await createReq('/resolution', doctorResolution.value, 'POST');
+    const response = await createReq('/doctor/resolution', doctorResolution.value, 'POST');
     console.log(response);
     const data = await response.json();
     console.log(data);
+    displayPatientNameForDoctor.textContent = '';
   } catch (err) {
     console.log('Request failed', err);
   }
@@ -36,7 +41,7 @@ addBtnForResolution.addEventListener('click', async () => {
 
 showResolutionBtn.addEventListener('click', async () => {
   try {
-    const response = await fetch(`/resolution_patient/${inputForSearchResolution.value}`);
+    const response = await fetch(`/doctor/resolution_patient/${inputForSearchResolution.value}`);
     const data = await response.json();
     console.log(data);
 
@@ -48,7 +53,7 @@ showResolutionBtn.addEventListener('click', async () => {
 deleteResolutionBtn.addEventListener('click', async () => {
   try {
     console.log(inputForSearchResolution.value);
-    const response = await createReq('/resolution', deleteResolutionID.value, 'DELETE');
+    const response = await createReq('/doctor/resolution', deleteResolutionID.value, 'DELETE');
     console.log(response);
     const data = await response.json();
     console.log(data);

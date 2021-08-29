@@ -21,12 +21,15 @@
 7. В папке tests тесты.
 8. Файл config.js -конфигурация порта и типа хранилища;
 9. Файл injector.js - Запускает нужный тип хранилижа в зависимости от конфигурации;
+10. routes роутеры;
+11. initialization-data-clients - фойлы для инициализации баз данных;
 
 
 Чтобы запустить тесты : выполнить команду    npm test   в консоли;
 
 Забрать образ с докера:  
  docker pull anhryb/clinic-app:latest ;
-запустить на порту localhost:3000 :
+ 
+Запустить на порту localhost:3000 :
 docker run -p 3000:3000 -d —rm anhryb/clinic-app ;
         

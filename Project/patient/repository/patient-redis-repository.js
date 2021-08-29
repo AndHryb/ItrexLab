@@ -7,36 +7,19 @@ export default class PatientRedisRepository {
     this.client = redisClient;
   }
 
-  async add(name, resolutionId) {
+  async add(name) {
     const patientId = uuidv4();
 
     const addValue = promisify(this.client.hset).bind(this.client);
 
     const patientData = {
       name,
-      resolutionId,
       regTime: (new Date()).getTime(),
     };
 
     await addValue(this.DS, patientId, JSON.stringify(patientData));
 
     return patientId;
-  }
-
-  async setResolutionID(patientId, resolutionId) {
-    const getValue = promisify(this.client.hget).bind(this.client);
-    const result = await getValue(this.DS, patientId);
-
-    if (!result) { return false; }
-
-    const data = JSON.parse(result);
-
-    data.resolutionId = resolutionId;
-
-    const addValue = promisify(this.client.hset).bind(this.client);
-    await addValue(this.DS, patientId, JSON.stringify(data));
-
-    return true;
   }
 
   async getByName(name) {
@@ -48,7 +31,11 @@ export default class PatientRedisRepository {
     for (const patientId in result) {
       const data = JSON.parse(result[patientId]);
       if (data.name === name) {
-        patientList.push(data);
+        patientList.push({
+          patientId,
+          name: data.name,
+          regTime: data.regTime,
+        });
       }
     }
     return patientList;
@@ -59,6 +46,7 @@ export default class PatientRedisRepository {
     const result = await getValue(this.DS, patientId);
 
     if (!result) { return false; }
+    console.log(result);
 
     return JSON.parse(result);
   }

@@ -17,15 +17,20 @@ export default class ResolutionService {
     try {
       return await this.resolutionRepository.getById(resolutionId);
     } catch (err) {
-      console.log(`Resolution service get error :${err.name} : ${err.message}`);
+      console.log(`Resolution service getByID error :${err.name} : ${err.message}`);
+    }
+  }
+  async getByPatientId(patieniId) {
+    try {
+      return await this.resolutionRepository.getByPatientId(patieniId);
+    } catch (err) {
+      console.log(`Resolution service getByPatientId error :${err.name} : ${err.message}`);
     }
   }
 
   async delete(resolutionId) {
     try {
       const result = await this.resolutionRepository.delete(resolutionId);
-      console.log('del result>>>>')
-      console.log(result);
       return result;
     } catch (err) {
       console.log(`Resolution service delete error :${err.name} : ${err.message}`);

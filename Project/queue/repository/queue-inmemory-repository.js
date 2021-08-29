@@ -19,7 +19,7 @@ class QueueInmemoryRepository {
     if (this.queue.length === 0) {
       return false;
     }
-    return this.queue.shift(); // Во всех сервисах необходимо возратить!!!
+    return this.queue.shift();
   }
 
   getLength() {

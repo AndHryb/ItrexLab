@@ -17,7 +17,7 @@ export default class QueueService {
 
   async add(name) {
     try {
-      const createdPatient = await this.patientRepository.add(name, '');
+      const createdPatient = await this.patientRepository.add(name);
       await this.queueRepository.add(createdPatient);
 
       return name;

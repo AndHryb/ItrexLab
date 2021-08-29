@@ -5,23 +5,14 @@ class PatientInmemoryRepository {
     this.data = {};
   }
 
-  add(name, resolutionId) {
+  add(name) {
     const patientId = uuidv4();
 
     this.data[patientId] = {
       name,
-      resolutionId,
       regTime: (new Date()).getTime(),
     };
     return patientId;
-  }
-
-  setResolutionID(patientId, resolutionId) {
-    this.data[patientId].resolutionId = resolutionId;
-
-    if (!resolutionId) { return false; }
-
-    return true;
   }
 
   getByName(name) {
@@ -29,7 +20,11 @@ class PatientInmemoryRepository {
 
     for (const patientId in this.data) {
       if (this.data[patientId].name === name) {
-        patientList.push(this.data[patientId]);
+        patientList.push({
+          patientId,
+          name: this.data[patientId].name,
+          regTime: this.data[patientId].regTime,
+        });
       }
     }
 
@@ -44,7 +39,10 @@ class PatientInmemoryRepository {
   }
 
   delete(patientId) {
-    return delete this.data[patientId];
+    const res = patientId in this.data;
+    delete this.data[patientId];
+
+    return res;
   }
 }
 

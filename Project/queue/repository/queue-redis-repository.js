@@ -13,6 +13,8 @@ export default class QueueRedisRepository {
     const firstInQueue = promisify(this.client.lindex).bind(this.client);
     const result = await firstInQueue('queue', 0);
 
+    console.log(result);
+
     return result;
   }
 
@@ -28,7 +30,7 @@ export default class QueueRedisRepository {
     if (listLength === 0) {
       return false;
     }
-    const popResult = promisify(this.client.rpop).bind(this.client);
+    const popResult = promisify(this.client.lpop).bind(this.client);
     const result = await popResult('queue');
 
     return result;

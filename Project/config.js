@@ -33,10 +33,23 @@ const test = {
     port: 6379,
   },
 };
+const sql = {
+  app: {
+    port: process.env.PORT || 3000,
+  },
+  storage: {
+    name: 'SQL',
+    port: 6379,
+    SQLPort: 3306,
+    SQLHost: 'localhost',
+    SQLDialect: 'mysql',
+  },
+};
 const config = {
   memory,
   redis,
   test,
+  sql,
 };
 const envConfig = config[env];
 
