@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  app:
+    image: anhryb/clinic-app
+    container_name: clinic
+    command: node main.js
+    ports:
+    - 3000:3000
+    working_dir: /app
+    environment:
+      NODE_ENV: sql
+      QUEUE_REPOSITORY: redis
+      TEST_REPOSITORY: memory
+      PORT: 3000
+      TTL: 10000
+      REPOSITORY_HOST: redis
+      SQL_HOST: db
+    depends_on: [db,redis]
+  db:
+    image: mysql:8.0
+    command: '--default-authentication-plugin=mysql_native_password'
+    restart: always
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent" ]
+      interval: 3s
+      retries: 5
+      start_period: 30s
+    volumes:
+    - my-sql-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=143234
+      - MYSQL_DATABASE=clinic_db
+  redis:
+    image: redis:6.2
+    restart: always
+volumes:
+    my-sql-data:
+
+
+
+
+

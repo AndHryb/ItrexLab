@@ -11,6 +11,7 @@ const memory = {
   },
   storage: {
     name: 'memory',
+    host: process.env.REPOSITORY_HOST,
     port: 6379,
   },
 };
@@ -21,6 +22,7 @@ const redis = {
   },
   storage: {
     name: 'redis',
+    host: process.env.REPOSITORY_HOST,
     port: 6379,
   },
 };
@@ -30,6 +32,7 @@ const test = {
   },
   storage: {
     name: process.env.TEST_STORAGE,
+    host: process.env.REPOSITORY_HOST,
     port: 6379,
   },
 };
@@ -39,9 +42,10 @@ const sql = {
   },
   storage: {
     name: 'SQL',
+    host: process.env.REPOSITORY_HOST,
     port: 6379,
     SQLPort: 3306,
-    SQLHost: 'localhost',
+    SQLHost: process.env.SQL_HOST,
     SQLDialect: 'mysql',
   },
 };
