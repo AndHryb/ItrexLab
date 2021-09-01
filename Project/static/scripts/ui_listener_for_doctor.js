@@ -11,10 +11,20 @@ const showResolutionBtn = document.getElementById('show_resolution_btn');
 const textAreaForResolution = document.getElementById('text_area_for_doctor_resolution');
 const deleteResolutionBtn = document.getElementById('del_resolution_btn');
 const deleteResolutionID = document.getElementById('del_resolution_id');
+async function gettCurrent(){
+  try {
+    const response = await fetch('/patient/next_in_queue');
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.log('Request failed', err);
+  }
+}
+
 
 nextBtnForDoctor.addEventListener('click', async () => {
   try {
-    const response = await fetch('/doctor/next_in_queue');
+    const response = await fetch('/patient/next_in_queue');
     const data = await response.json();
     displayPatientNameForDoctor.textContent = data;
   } catch (err) {
@@ -23,7 +33,7 @@ nextBtnForDoctor.addEventListener('click', async () => {
 });
 
 addBtnForResolution.addEventListener('click', async () => {
-  if(displayPatientNameForDoctor.textContent === ''||doctorResolution.value === ''){
+  if (doctorResolution.value === ''|| await gettCurrent() !== displayPatientNameForDoctor.textContent) {
     return false;
   }
   try {
@@ -31,7 +41,6 @@ addBtnForResolution.addEventListener('click', async () => {
     console.log(response);
     const data = await response.json();
     console.log(data);
-    displayPatientNameForDoctor.textContent = '';
   } catch (err) {
     console.log('Request failed', err);
   }

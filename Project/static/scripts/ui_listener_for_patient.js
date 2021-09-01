@@ -22,7 +22,7 @@ addBtnForPatientName.addEventListener('click', async () => {
 
 inputForPatientName.addEventListener('blur', () => {
   if (inputForPatientName.value === '') {
-    patientInputValidation.textContent = 'the name field should not be empty and consist only of letters';
+    patientInputValidation.textContent = 'incorrect name';
     return false;
   }
   patientInputValidation.textContent = '';
@@ -32,7 +32,7 @@ inputForPatientName.addEventListener('blur', () => {
 searchForPatientName.addEventListener('change', async () => {
   try {
     console.log(searchForPatientName.value);
-    const response = await fetch(`/resolution_patient/${searchForPatientName.value}`);
+    const response = await fetch(`doctor/resolution_patient/${searchForPatientName.value}`);
     console.log(response);
     const data = await response.json();
     textAreaForPatient.value = data;
@@ -42,7 +42,7 @@ searchForPatientName.addEventListener('change', async () => {
 });
 
 const subscribe = async () => {
-  const eventSource = new EventSource('http://localhost:3000/connect');
+  const eventSource = new EventSource('/patient/connect');
   eventSource.onmessage = function (event) {
     const result = JSON.parse(event.data);
     displayPatientName.textContent = result;
@@ -50,3 +50,13 @@ const subscribe = async () => {
 };
 
 subscribe();
+
+window.addEventListener('load', async () => {
+  try {
+    const response = await fetch('/patient/next_in_queue');
+    const data = await response.json();
+    displayPatientName.textContent = data;
+  } catch (err) {
+    console.log('Request failed', err);
+  }
+});

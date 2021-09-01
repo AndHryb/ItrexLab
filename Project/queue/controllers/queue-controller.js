@@ -24,8 +24,8 @@ export default class QueueController {
 
 
     if (!result) {
-      res.status = STATUSES.BadRequest;
-      res.value = 'The queueRepository is empty';
+      res.status = STATUSES.NotFound;
+      res.value = '';
       return res;
     }
     res.value = result;

@@ -38,7 +38,7 @@ class Injector {
       this.queueRepository = new QueueRedisRepository(client);
     }
     this.queueServise = new QueueService(this.patientRepository, this.queueRepository);
-    this.resolutionServise = new ResolutionService(this.resolutionRepository, this.resolutionRepository);
+    this.resolutionServise = new ResolutionService(this.resolutionRepository);
     this.patientService = new PatientService(this.patientRepository, this.resolutionRepository);
     this.queueController = new QueueController(this.queueServise);
     this.resolutionController = new ResolutionController(this.queueServise, this.resolutionServise, this.patientService, TTL);

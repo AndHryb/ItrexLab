@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import Ajv from 'ajv';
+import {__dirname} from '../main.js';
 import { injector } from '../injector.js';
 import { STATUSES } from '../constants.js';
 import { checkResolutionSchema } from '../helpers/validation-schems-ajv/checkResolution.js';
@@ -11,11 +12,11 @@ const resolutionRouter = express.Router();
 const ajv = new Ajv();
 const resolutionController = injector.getResolutionController();
 
-resolutionRouter.get('/doctor', (req, res) => {
+resolutionRouter.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static', 'doctor.html'));
 });
 
-resolutionRouter.post('/doctor/resolution', async (req, res, next) => {
+resolutionRouter.post('/resolution', async (req, res, next) => {
   if (ajv.validate(checkResolutionSchema, req.body)) {
     await next();
   } else { res.status(STATUSES.BadRequest).json('The field must not be empty'); }
@@ -25,7 +26,7 @@ resolutionRouter.post('/doctor/resolution', async (req, res, next) => {
   res.status(result.status).json(result.value);
 });
 
-resolutionRouter.get('/doctor/resolution_patient/:name', async (req, res, next) => {
+resolutionRouter.get('/resolution_patient/:name', async (req, res, next) => {
   if (ajv.validate(checkNameSchema, req.params.name)) {
     await next();
   } else { res.status(STATUSES.BadRequest).json('Incorect patient name'); }
@@ -35,10 +36,10 @@ resolutionRouter.get('/doctor/resolution_patient/:name', async (req, res, next) 
   res.status(result.status).json(arrSerialize(result.value));
 });
 
-resolutionRouter.delete('/doctor/resolution', async (req, res, next) => {
+resolutionRouter.delete('/resolution', async (req, res, next) => {
   if (req.body) {
     await next();
-  } else { res.status(STATUSES.BadRequest).json('Incorect patient name'); }
+  } else { res.status(STATUSES.BadRequest).json('Incorrect patient name'); }
 }, async (req, res) => {
   const result = await resolutionController.deleteResolution(req.body);
   res.set('Content-Type', 'application/json;charset=utf-8');
