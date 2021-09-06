@@ -1,30 +1,25 @@
 import { STATUSES, TTL } from '../constants.js';
 import ResolutionController from '../resolution/controllers/resolution-controller.js';
 import ResolutionService from '../resolution/service/resolution-service.js';
-import QueueService from '../queue/service/queue-service.js';
-import PatientService from '../patient/service/patient-service.js';
-import { resolutionInmemoryRepository } from '../resolution/repository/resolution-inmemory-repository.js';
-import { queueInmemoryRepository } from '../queue/repository/queue-inmemory-repository.js';
-import { patientInmemoryRepository } from '../patient/repository/patient-inmemory-repository.js';
+import ResolutionSqlRepository from '../resolution/repository/resolution-sql-repository.js';
+import sequelizeInit from '../config-data-bases/sequelize/sequelize-init.js';
+
+const sequelize = sequelizeInit();
+const { resolutionsSQLDB } = sequelize.models;
+
+const resolutionSqlRepository = new ResolutionSqlRepository(resolutionsSQLDB);
+const resolutionService = new ResolutionService(resolutionSqlRepository);
+const resolutionController = new ResolutionController(resolutionService);
 
 jest.mock('../resolution/service/resolution-service.js');
-jest.mock('../queue/service/queue-service.js');
-jest.mock('../patient/service/patient-service.js');
 
 describe('resolution controller unit test', () => {
-  const resolutionService = new ResolutionService(resolutionInmemoryRepository);
-  const queueService = new QueueService(queueInmemoryRepository);
-  const patientService = new PatientService(patientInmemoryRepository);
-  const resolutionController = new ResolutionController(queueService, resolutionService, patientService, TTL);
-
   let resolutionData1;
-  let resolutionData2;
   let patientData1;
   let patientData2;
   let patientList = [];
   const testRegTime = (new Date()).getTime();
   const resolutionId = '111';
-  const patientId = '222'
   const resolutionVal = 'schizophrenia';
 
   beforeEach(() => {
@@ -34,11 +29,6 @@ describe('resolution controller unit test', () => {
       resolution: 'schizophrenia',
       regTime: testRegTime,
     };
-    // resolutionData2 = {
-    //   resolution: 'schizophrenia',
-    //   patientId: '232',
-    //   regTime: testRegTime,
-    // };
     patientData1 = {
       name: 'Andrei',
       regTime: testRegTime,
@@ -53,65 +43,71 @@ describe('resolution controller unit test', () => {
         name: 'Andrei',
         regTime: testRegTime,
       },
+      {
+        patientId: '232',
+        name: 'Andrei',
+        regTime: testRegTime,
+      },
     ];
   });
 
   test('get resolutions by name', async () => {
-    patientService.getByName.mockResolvedValue(patientList);
-    resolutionService.getByPatientId.mockResolvedValue(resolutionData1);
+    resolutionService.getResolutionsByName.mockResolvedValue(patientList);
     const res = await resolutionController.getResolutionsByName('Andrei');
     expect(res.status).toEqual(STATUSES.OK);
-    expect(res.value).toEqual([{
-      name: 'Andrei',
-      id: '111',
-      resolution: 'schizophrenia',
-      regTime: testRegTime,
-    }]);
+    expect(res.value.resolutions).toEqual(patientList);
+    expect(res.value.message).toEqual(`${patientList.length} patient(s) were found`);
   });
 
   test('get resolution by name(patient storage hasn\'t this name)', async () => {
-    patientService.getByName.mockResolvedValue([]);
-    resolutionService.getByPatientId.mockResolvedValue(resolutionData1);
+    resolutionService.getResolutionsByName.mockResolvedValue(false);
     const res = await resolutionController.getResolutionsByName('Andrei');
-    expect(res.status).toEqual(STATUSES.NotFound);
-    expect(res.value).toEqual(
+    expect(res.status).toEqual(STATUSES.OK);
+    expect(res.value.resolutions).toBeFalsy();
+    expect(res.value.message).toEqual(
       'The patient Andrei not found in the database',
     );
   });
 
   test('add resolution data(queueRepository has patient)', async () => {
-    queueService.getLength.mockResolvedValue(1);
-    queueService.delete.mockResolvedValue(patientId);
-    resolutionService.add.mockResolvedValue(resolutionId);
-    patientService.getById.mockResolvedValue(patientData1);
-
+    resolutionService.addResolution.mockResolvedValue(patientData1);
     const res = await resolutionController.addResolution(resolutionVal);
     expect(res.status).toEqual(STATUSES.Created);
-    expect(res.value).toEqual(`Added resolution for ${patientData1.name}`);
+    expect(res.value).toEqual(patientData1);
   });
 
   test('add resolution data(queue empty hasn\'t patient)', async () => {
-    queueService.getLength.mockResolvedValue(0);
-    queueService.delete.mockResolvedValue(patientId);
-    resolutionService.add.mockResolvedValue(resolutionId);
-    patientService.getById.mockResolvedValue(patientData1);
-
+    resolutionService.addResolution.mockResolvedValue(false);
     const res = await resolutionController.addResolution(resolutionVal);
     expect(res.status).toEqual(STATUSES.PreconditionFailed);
-    expect(res.value).toEqual('Can\'t added resolution. There is no one in the queueRepository');
+    expect(res.value.message).toEqual('Can\'t added resolution. There is no one in the queueRepository');
   });
 
   test('delete resolution data(storage has key)', async () => {
-    resolutionService.delete.mockResolvedValue(true);
+    resolutionService.delete.mockResolvedValue(patientData2);
     const res = await resolutionController.deleteResolution(resolutionId);
     expect(res.status).toEqual(STATUSES.OK);
-    expect(res.value).toEqual(`The resolution  ${resolutionId} deleted`);
+    expect(res.value.message).toEqual(`The resolution  ${resolutionId} deleted`);
   });
 
   test('delete resolution data(storage hasn\'t key)', async () => {
     resolutionService.delete.mockResolvedValue(false);
     const res = await resolutionController.deleteResolution(resolutionId);
     expect(res.status).toEqual(STATUSES.NotFound);
-    expect(res.value).toEqual(`The resolution ${resolutionId} not found in the database`);
+    expect(res.value.message).toEqual(`The resolution ${resolutionId} not found in the database`);
+  });
+
+  test('get resolution by token (token valid)', async () => {
+    resolutionService.getResolutionByToken.mockResolvedValue(resolutionData1);
+    const res = await resolutionController.getResolutionByToken(resolutionId);
+    expect(res.status).toEqual(STATUSES.OK);
+    expect(res.value.resolution).toEqual(resolutionData1);
+  });
+
+  test('get resolution by token (token invalid)', async () => {
+    resolutionService.getResolutionByToken.mockResolvedValue(false);
+    const res = await resolutionController.getResolutionByToken(resolutionId);
+    expect(res.status).toEqual(STATUSES.NotFound);
+    expect(res.value.message).toEqual('The resolution not found in the database.Make an appointment with a doctor.');
   });
 });

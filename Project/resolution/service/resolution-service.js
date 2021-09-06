@@ -12,8 +12,6 @@ export default class ResolutionService {
     let res = false;
     try {
       const patientsList = await this.patientRepository.getByName(name);
-      console.log('res service patientList>>>>>>');
-      console.log(patientsList);
       if (patientsList.length === 0) {
         return res;
       }
@@ -50,8 +48,6 @@ export default class ResolutionService {
       const decoded = decodeToken(token);
       const patient = await this.patientRepository.getByUserId(decoded.userId);
       const result = await this.resolutionRepository.getByPatientId(patient.id);
-      console.log('res service result by token>>>>>');
-      console.log(result);
 
       return result;
     } catch (err) {

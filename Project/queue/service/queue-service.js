@@ -7,6 +7,9 @@ export default class QueueService {
   async get() {
     try {
       const result = await this.queueRepository.get();
+      if (!result) {
+        return false;
+      }
       const patient = await this.patientRepository.getById(result);
 
       return patient.name;
@@ -18,7 +21,7 @@ export default class QueueService {
   async add(patientId) {
     try {
       const result = await this.queueRepository.add(patientId);
-      if(result){
+      if (result) {
         return result;
       }
       return false;

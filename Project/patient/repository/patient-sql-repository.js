@@ -39,14 +39,11 @@ export default class PatientSqlRepository {
         id: patientId,
       },
     });
-    const result = {
-      name: patient.name,
-      regTime: (new Date(patient.createdAt)).getTime(),
-    };
-    if (result.name === undefined || result.regTime === undefined) {
+
+    if (!patient) {
       return false;
     }
-    return result;
+    return patient;
   }
 
   async delete(patientID) {
@@ -68,8 +65,7 @@ export default class PatientSqlRepository {
     if (!patient) {
       return false;
     }
-    console.log('Patient repo get byuser id>>>>>');
-    console.log(patient);
+
     return patient;
   }
 }

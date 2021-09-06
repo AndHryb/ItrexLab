@@ -9,7 +9,7 @@ const { Sequelize } = pkg;
 
 export default function sequelizeInit() {
   const sequelize = new Sequelize(process.env.SQL_DB, process.env.SQL_USER, process.env.SQL_PASSWORD, {
-    dialect: envConfig.storage.SQLDialect,
+    dialect: 'mysql',
     host: envConfig.storage.SQLHost,
     port: envConfig.storage.SQLPort,
     database: process.env.SQL_DB,
