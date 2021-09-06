@@ -67,7 +67,7 @@ export default class ResolutionRedisRepository {
     const deleteValue = promisify(this.client.hdel).bind(this.client);
     const delResult = await deleteValue(this.DS, resolutionId);
     if (delResult) {
-      return result;
+      return result.patientID;
     }
     return false;
   }

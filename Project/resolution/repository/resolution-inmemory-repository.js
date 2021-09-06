@@ -45,7 +45,12 @@ class ResolutionInmemoryRepository {
   }
 
   delete(resolutionId) {
-    return delete this.data[resolutionId];
+    const result = this.getById(resolutionId);
+    delete this.data[resolutionId];
+    if(!result){
+      return false;
+    }
+    return result.patientId;
   }
 }
 

@@ -12,9 +12,6 @@ export default class QueueRedisRepository {
     }
     const firstInQueue = promisify(this.client.lindex).bind(this.client);
     const result = await firstInQueue('queue', 0);
-
-    console.log(result);
-
     return result;
   }
 

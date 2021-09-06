@@ -17,31 +17,38 @@ resolutionRouter.get('/', (req, res) => {
 });
 
 resolutionRouter.post('/resolution', async (req, res, next) => {
-  if (ajv.validate(checkResolutionSchema, req.body)) {
-    await next();
+  if (ajv.validate(checkResolutionSchema, req.body.value)) {
+    next();
   } else { res.status(STATUSES.BadRequest).json('The field must not be empty'); }
 }, async (req, res) => {
-  const result = await resolutionController.addResolution(req.body);
+  const result = await resolutionController.addResolution(req.body.value);
+  res.set('Content-Type', 'application/json;charset=utf-8');
+  res.status(result.status).json(result.value);
+});
+
+resolutionRouter.get('/resolution_patient', async (req, res) => {
+  const result = await resolutionController.getResolutionByToken(req.headers.authorization);
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
 });
 
 resolutionRouter.get('/resolution_patient/:name', async (req, res, next) => {
   if (ajv.validate(checkNameSchema, req.params.name)) {
-    await next();
-  } else { res.status(STATUSES.BadRequest).json('Incorect patient name'); }
+    next();
+  } else { res.status(STATUSES.BadRequest).json('Incorrect patient name'); }
 }, async (req, res) => {
   const result = await resolutionController.getResolutionsByName(req.params.name);
   res.set('Content-Type', 'application/json;charset=utf-8');
-  res.status(result.status).json(arrSerialize(result.value));
+  res.status(result.status).json(result.value);
 });
 
 resolutionRouter.delete('/resolution', async (req, res, next) => {
-  if (req.body) {
-    await next();
+  console.log(req.body);
+  if (req.body.value) {
+    next();
   } else { res.status(STATUSES.BadRequest).json('Incorrect patient name'); }
 }, async (req, res) => {
-  const result = await resolutionController.deleteResolution(req.body);
+  const result = await resolutionController.deleteResolution(req.body.value);
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
 });

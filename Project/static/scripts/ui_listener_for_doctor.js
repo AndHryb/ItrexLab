@@ -1,4 +1,8 @@
-import createReq from './http-req.js';
+import { authClient } from './auth-api.js';
+authClient.getCookieToken();
+
+console.log('check token doktor page>>>>');
+console.log(authClient.token);
 
 const displayPatientNameForDoctor = document.getElementById('display_patient_name_for_doctor');
 const nextBtnForDoctor = document.getElementById('next_btn');
@@ -11,21 +15,40 @@ const showResolutionBtn = document.getElementById('show_resolution_btn');
 const textAreaForResolution = document.getElementById('text_area_for_doctor_resolution');
 const deleteResolutionBtn = document.getElementById('del_resolution_btn');
 const deleteResolutionID = document.getElementById('del_resolution_id');
-async function gettCurrent(){
+
+function arrSerialize(arr) {
+  if (typeof arr !== 'object') {
+    return false;
+  }
+
+  let value = '';
+  for (const elem of arr) {
+    const str = `
+    name: ${elem.name},
+    resolution: ${elem.resolution},
+    resoluton ID: ${elem.id},
+    registration date: ${new Date(elem.regTime)}
+    `;
+    value += str;
+  }
+
+  return value;
+}
+
+async function gettCurrent() {
   try {
-    const response = await fetch('/patient/next_in_queue');
-    const data = await response.json();
+    const response = await authClient.client.get('/patient/next_in_queue');
+    const data = await response.data;
     return data;
   } catch (err) {
     console.log('Request failed', err);
   }
 }
 
-
 nextBtnForDoctor.addEventListener('click', async () => {
   try {
-    const response = await fetch('/patient/next_in_queue');
-    const data = await response.json();
+    const response = await authClient.client.get('/patient/next_in_queue');
+    const data = await response.data;
     displayPatientNameForDoctor.textContent = data;
   } catch (err) {
     console.log('Request failed', err);
@@ -33,14 +56,16 @@ nextBtnForDoctor.addEventListener('click', async () => {
 });
 
 addBtnForResolution.addEventListener('click', async () => {
-  if (doctorResolution.value === ''|| await gettCurrent() !== displayPatientNameForDoctor.textContent) {
+  if (doctorResolution.value === '' || await gettCurrent() !== displayPatientNameForDoctor.textContent) {
     return false;
   }
   try {
-    const response = await createReq('/doctor/resolution', doctorResolution.value, 'POST');
-    console.log(response);
-    const data = await response.json();
-    console.log(data);
+    console.log(doctorResolution.value);
+    const response = await authClient.client.post('/doctor/resolution', { value: doctorResolution.value });
+    const data = await response.data;
+    if (data.name) {
+      console.log(`Resolution for ${data.name} added`);
+    } else { console.log(data); }
   } catch (err) {
     console.log('Request failed', err);
   }
@@ -50,23 +75,20 @@ addBtnForResolution.addEventListener('click', async () => {
 
 showResolutionBtn.addEventListener('click', async () => {
   try {
-    const response = await fetch(`/doctor/resolution_patient/${inputForSearchResolution.value}`);
-    const data = await response.json();
+    const response = await authClient.client.get(`/doctor/resolution_patient/${inputForSearchResolution.value}`);
+    const data = await response.data;
     console.log(data);
-
-    textAreaForResolution.value = data;
+    textAreaForResolution.value = arrSerialize(data.resolutions) || data.message;
   } catch (err) {
     console.log('Request failed', err);
   }
 });
 deleteResolutionBtn.addEventListener('click', async () => {
   try {
-    console.log(inputForSearchResolution.value);
-    const response = await createReq('/doctor/resolution', deleteResolutionID.value, 'DELETE');
-    console.log(response);
-    const data = await response.json();
-    console.log(data);
-    textAreaForResolution.value = data;
+    const response = await authClient.client.delete('/doctor/resolution', { data: { value: deleteResolutionID.value }});
+    const data = await response.data;
+    textAreaForResolution.value = data.message;
+    console.log(data.message);
     setTimeout(() => {
       textAreaForResolution.value = '';
     }, 1000);

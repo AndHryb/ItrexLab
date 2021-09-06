@@ -1,7 +1,8 @@
 import pkg from 'sequelize';
 import applyExtraSetup from './extra-setup.js';
-import patientModel from './patient-model.js';
-import resolutionModel from './resolution-model.js';
+import patientModel from '../../models/patient-model.js';
+import resolutionModel from '../../models/resolution-model.js';
+import userModel from '../../models/user-model.js';
 import { envConfig } from '../../config.js';
 
 const { Sequelize } = pkg;
@@ -24,6 +25,7 @@ export default function sequelizeInit() {
   const modelDefiners = [
     patientModel,
     resolutionModel,
+    userModel,
   ];
 
   for (const modelDefiner of modelDefiners) {

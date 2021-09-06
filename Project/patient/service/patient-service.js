@@ -1,3 +1,5 @@
+//этот сервис не используеться
+
 export default class PatientService {
   constructor(patientRepository, resolutionRepository) {
     this.patientRepository = patientRepository;

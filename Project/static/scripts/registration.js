@@ -1,7 +1,6 @@
-import createReq from './http-req.js';
+import { authClient } from './auth-api.js';
 
 const formObj = document.reg_form;
-let enteredDate;
 
 function emailValid(focusWhenError) {
   const elem = formObj.elements.patient_email;
@@ -71,7 +70,7 @@ function birthdayDateValid(focusWhenError) {
   const { value } = elem;
   const date = value.split('-');
   const currentDate = new Date();
-  enteredDate = new Date(date[0], (date[1] - 1), date[2]);
+  const enteredDate = new Date(date[0], (date[1] - 1), date[2]);
   const timeForFillOut = 3155760000000;
   const displayErr = document.getElementById('birthday_err');
   if (enteredDate.getTime() > (currentDate.getTime() - timeForFillOut || value)) {
@@ -125,18 +124,15 @@ document.reg_form.onsubmit = async function (EO) {
     email: formObj.elements.patient_email.value,
     password: formObj.elements.patient_password.value,
     name: formObj.elements.patient_name.value,
-    birthday: enteredDate,
+    birthday: new Date(formObj.elements.patient_birthday.value).getTime(),
     gender: formObj.elements.patient_gender.value,
   };
 
-  console.log(formData);
-
   try {
-    const response = await createReq('/registration/form', formData, 'POST');
-    console.log(response);
-    const data = await response.json();
-    console.log(data.message);
-    window.location.href = '/patient';
+    const result = await authClient.registration(formData);
+    console.log(result);
+    document.cookie = `token=${authClient.token};path=/;`;
+    window.location = 'http://localhost:3000/patient';
   } catch (err) {
     console.log('Request failed', err);
   }

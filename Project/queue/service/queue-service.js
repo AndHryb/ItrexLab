@@ -11,18 +11,19 @@ export default class QueueService {
 
       return patient.name;
     } catch (err) {
-      console.log(`Queue Servise get error : ${err.name} : ${err.message}`);
+      console.log(`Queue Service get error : ${err.name} : ${err.message}`);
     }
   }
 
-  async add(name) {
+  async add(patientId) {
     try {
-      const createdPatient = await this.patientRepository.add(name);
-      await this.queueRepository.add(createdPatient);
-
-      return name;
+      const result = await this.queueRepository.add(patientId);
+      if(result){
+        return result;
+      }
+      return false;
     } catch (err) {
-      console.log(`QueueServise add error : ${err.name} : ${err.message}`);
+      console.log(`QueueService add error : ${err.name} : ${err.message}`);
     }
   }
 
@@ -30,7 +31,7 @@ export default class QueueService {
     try {
       return await this.queueRepository.delete();
     } catch (err) {
-      console.log(`QueueServise delete error : ${err.name} : ${err.message}`);
+      console.log(`QueueService delete error : ${err.name} : ${err.message}`);
     }
   }
 
@@ -38,7 +39,7 @@ export default class QueueService {
     try {
       return await this.queueRepository.getLength();
     } catch (err) {
-      console.log(`QueueServise getLength error : ${err.name} : ${err.message}`);
+      console.log(`QueueService getLength error : ${err.name} : ${err.message}`);
     }
   }
 }

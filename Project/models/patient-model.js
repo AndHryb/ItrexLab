@@ -4,7 +4,7 @@ const { DataTypes, UUIDV4 } = pkg;
 
 export default function patientModel(sequelize) {
   const model = sequelize.define('patientsSQLDB', {
-    patientId: {
+    id: {
       type: DataTypes.UUID,
       defaultValue: UUIDV4,
       primaryKey: true,
@@ -12,6 +12,12 @@ export default function patientModel(sequelize) {
 
     name: {
       type: DataTypes.STRING,
+    },
+    gender: {
+      type: DataTypes.STRING,
+    },
+    birthday: {
+      type: DataTypes.DATEONLY,
     },
   });
 

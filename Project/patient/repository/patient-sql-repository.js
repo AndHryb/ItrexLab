@@ -3,12 +3,15 @@ export default class PatientSqlRepository {
     this.model = model;
   }
 
-  async add(name) {
+  async add(name, gender, birthday, userId) {
     const patient = await this.model.create({
       name,
+      gender,
+      birthday,
+      userId,
     });
 
-    return patient.patientId;
+    return patient;
   }
 
   async getByName(name) {
@@ -20,12 +23,8 @@ export default class PatientSqlRepository {
 
     const resultList = [];
     for (const patient of patientlist) {
-      console.log('patient>>>>');
-      console.log(this.model);
-      console.log(patient.dataValues);
-
       resultList.push({
-        patientId: patient.dataValues.patientId,
+        patientId: patient.dataValues.id,
         name: patient.dataValues.name,
         regTime: (new Date(patient.dataValues.createdAt)).getTime(),
       });
@@ -37,7 +36,7 @@ export default class PatientSqlRepository {
   async getById(patientId) {
     const patient = await this.model.findOne({
       where: {
-        patientId,
+        id: patientId,
       },
     });
     const result = {
@@ -53,9 +52,24 @@ export default class PatientSqlRepository {
   async delete(patientID) {
     const deleteValue = await this.model.destroy({
       where: {
-        patientID,
+        id: patientID,
       },
     });
     return deleteValue;
+  }
+
+  async getByUserId(userId) {
+    const patient = await this.model.findOne({
+      where: {
+        userId,
+      },
+    });
+
+    if (!patient) {
+      return false;
+    }
+    console.log('Patient repo get byuser id>>>>>');
+    console.log(patient);
+    return patient;
   }
 }

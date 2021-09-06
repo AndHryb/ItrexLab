@@ -19,8 +19,8 @@ describe('queueRepository controller unit tests', () => {
   test('first in queueRepository patient(queueRepository is empty)', async () => {
     queueService.get.mockResolvedValue(false);
     const res = await queueController.getNext();
-    expect(res.status).toEqual(STATUSES.BadRequest);
-    expect(res.value).toEqual('The queueRepository is empty');
+    expect(res.status).toEqual(STATUSES.NotFound);
+    expect(res.value).toEqual('The queue is empty');
   });
 
   test('add in queueRepository', async () => {

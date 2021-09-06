@@ -8,13 +8,13 @@ export default class ResolutionSqlRepository {
       patientId,
       resolution,
     });
-    return createdResolution.resolutionId;
+    return createdResolution.id;
   }
 
   async getById(resolutionId) {
     const resolution = await this.model.findOne({
       where: {
-        resolutionId,
+        id: resolutionId,
       },
     });
     return resolution;
@@ -26,28 +26,17 @@ export default class ResolutionSqlRepository {
         patientId,
       },
     });
-
-    const result = {
-      resolutionId: reqResolution.resolutionId,
-      patientId: reqResolution.patientId,
-      resolution: reqResolution.resolution,
-      regTime: (new Date(reqResolution.createdAt)).getTime(),
-    };
-
-    if (result.resolutionId === undefined
-        || result.patientId === undefined
-        || result.resolution === undefined
-        || result.regTime === undefined) {
+    if (!reqResolution) {
       return false;
     }
 
-    return result;
+    return reqResolution;
   }
 
   async delete(resolutionId) {
     const deleteValue = await this.model.destroy({
       where: {
-        resolutionId,
+        id: resolutionId,
       },
     });
     return deleteValue;
