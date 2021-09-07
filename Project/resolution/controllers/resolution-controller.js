@@ -11,7 +11,7 @@ export default class ResolutionController {
     const dataList = await this.resolutionService.getResolutionsByName(reqBody);
 
     if (!dataList) {
-      res.status = STATUSES.OK;
+      res.status = STATUSES.NotFound;
       res.value = {
         message: `The patient ${reqBody} not found in the database`,
       };
@@ -31,7 +31,7 @@ export default class ResolutionController {
     const res = new Request();
     const result = await this.resolutionService.getResolutionByToken(token);
     if (!result) {
-      res.status = STATUSES.NotFound;
+      res.status = STATUSES.OK;
       res.value = {
         message: 'The resolution not found in the database.Make an appointment with a doctor.',
       };

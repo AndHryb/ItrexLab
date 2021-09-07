@@ -62,7 +62,7 @@ describe('resolution controller unit test', () => {
   test('get resolution by name(patient storage hasn\'t this name)', async () => {
     resolutionService.getResolutionsByName.mockResolvedValue(false);
     const res = await resolutionController.getResolutionsByName('Andrei');
-    expect(res.status).toEqual(STATUSES.OK);
+    expect(res.status).toEqual(STATUSES.NotFound);
     expect(res.value.resolutions).toBeFalsy();
     expect(res.value.message).toEqual(
       'The patient Andrei not found in the database',
@@ -107,7 +107,7 @@ describe('resolution controller unit test', () => {
   test('get resolution by token (token invalid)', async () => {
     resolutionService.getResolutionByToken.mockResolvedValue(false);
     const res = await resolutionController.getResolutionByToken(resolutionId);
-    expect(res.status).toEqual(STATUSES.NotFound);
+    expect(res.status).toEqual(STATUSES.OK);
     expect(res.value.message).toEqual('The resolution not found in the database.Make an appointment with a doctor.');
   });
 });

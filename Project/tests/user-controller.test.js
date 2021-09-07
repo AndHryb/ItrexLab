@@ -73,7 +73,6 @@ describe('resolution controller unit test', () => {
       .toBeFalsy();
     expect(res.value.message)
       .toEqual(`the login ${loginData.email} was not found in the database`);
-
   });
 
   test('login(email not found)', async () => {
@@ -85,6 +84,14 @@ describe('resolution controller unit test', () => {
       .toBeFalsy();
     expect(res.value.message)
       .toEqual(`the login ${loginData.email} was not found in the database`);
+  });
+
+  test('login(the passwords don\'t match)', async () => {
+    userService.login.mockResolvedValue('password!');
+    const res = await userController.login(loginData);
+    expect(res.status).toEqual(STATUSES.Unauthorized);
+    expect(res.value.token).toBeFalsy();
+    expect(res.value.message).toEqual(`the password for ${loginData.email}  don't match`);
 
   });
-}
+});
