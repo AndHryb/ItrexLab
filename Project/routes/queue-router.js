@@ -3,8 +3,8 @@ import path from 'path';
 import Ajv from 'ajv';
 import events from 'events';
 import * as cookie from 'cookie';
-import { __dirname } from '../main.js';
 import { injector } from '../injector.js';
+const __dirname = path.resolve();
 
 import { checkNameSchema } from '../helpers/validation-schems-ajv/checkName.js';
 import { STATUSES } from '../constants.js';

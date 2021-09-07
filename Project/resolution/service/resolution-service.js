@@ -16,24 +16,22 @@ export default class ResolutionService {
         return res;
       }
 
-      console.log(patientsList);
       res = [];
       for (const elem of patientsList) {
-        const result = await this.resolutionRepository.getByPatientId(elem.patientId);
-        if (!result) {
+        const {dataValues} = await this.resolutionRepository.getByPatientId(elem.patientId);
+        if (!dataValues) {
           continue;
         }
 
-        if (this.TTL < (new Date()).getTime() - result.regTime) {
-          console.log(`time  ${this.TTL}` < (new Date()).getTime() - result.regTime);
-          result.resolution = `The resolution for patient ${elem.name} has expired`;
+        if (this.TTL < (new Date()).getTime() - (new Date(dataValues.createdAt)).getTime()) {
+          dataValues.resolution = `The resolution for patient ${elem.name} has expired`;
         }
 
-        if (result.resolution) {
+        if (dataValues.resolution) {
           res.push({
             name: elem.name,
-            id: result.id,
-            resolution: result.resolution,
+            id: dataValues.id,
+            resolution: dataValues.resolution,
             regTime: elem.regTime,
           });
         }

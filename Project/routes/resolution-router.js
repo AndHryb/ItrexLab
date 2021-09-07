@@ -1,13 +1,13 @@
 import express from 'express';
 import path from 'path';
 import Ajv from 'ajv';
-import {__dirname} from '../main.js';
+//import { __dirname } from '../main.js';
 import { injector } from '../injector.js';
 import { STATUSES } from '../constants.js';
 import { checkResolutionSchema } from '../helpers/validation-schems-ajv/checkResolution.js';
 import { checkNameSchema } from '../helpers/validation-schems-ajv/checkName.js';
-import arrSerialize from '../helpers/array-serialize.js';
 
+const __dirname = path.resolve();
 const resolutionRouter = express.Router();
 const ajv = new Ajv();
 const resolutionController = injector.getResolutionController();

@@ -2,8 +2,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import decodeToken from '../../helpers/decode-token.js';
 
-const { sign } = jwt;
-
 export default class UserService {
   constructor(userRepository, patientRepository) {
     this.userRepository = userRepository;

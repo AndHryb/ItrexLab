@@ -1,13 +1,13 @@
 import QueueService from '../queue/service/queue-service.js';
 import PatientSqlRepository from '../patient/repository/patient-sql-repository.js';
 import QueueRedisRepository from '../queue/repository/queue-redis-repository.js';
-import sequelizeInit from '../config-data-bases/sequelize/sequelize-init.js';
-import redisInit from '../config-data-bases/redis/redis-init.js';
+import SequelizeMock from 'sequelize-mock';
+import redis from 'redis-mock';
 
-const sequelize = sequelizeInit();
-const { patientsSQLDB } = sequelize.models;
-const patientSqlRepository = new PatientSqlRepository(patientsSQLDB);
-const queueRedisRepository = new QueueRedisRepository(redisInit());
+const client = redis.createClient();
+const patientsSQLDBMock = new SequelizeMock();
+const patientSqlRepository = new PatientSqlRepository(patientsSQLDBMock);
+const queueRedisRepository = new QueueRedisRepository(client);
 const queueService = new QueueService(patientSqlRepository, queueRedisRepository);
 
 jest.mock('../patient/repository/patient-sql-repository.js');
