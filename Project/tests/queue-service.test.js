@@ -1,12 +1,19 @@
 import QueueService from '../queue/service/queue-service.js';
-import { queueInmemoryRepository } from '../queue/repository/queue-inmemory-repository.js';
-import { patientInmemoryRepository } from '../patient/repository/patient-inmemory-repository.js';
+import PatientSqlRepository from '../patient/repository/patient-sql-repository.js';
+import QueueRedisRepository from '../queue/repository/queue-redis-repository.js';
+import sequelizeInit from '../config-data-bases/sequelize/sequelize-init.js';
+import redisInit from '../config-data-bases/redis/redis-init.js';
 
-jest.mock('../queue/repository/queue-inmemory-repository.js');
-jest.mock('../patient/repository/patient-inmemory-repository.js');
+const sequelize = sequelizeInit();
+const { patientsSQLDB } = sequelize.models;
+const patientSqlRepository = new PatientSqlRepository(patientsSQLDB);
+const queueRedisRepository = new QueueRedisRepository(redisInit());
+const queueService = new QueueService(patientSqlRepository, queueRedisRepository);
 
-describe('queueRepository service unit tests', () => {
-  const queueService = new QueueService(patientInmemoryRepository, queueInmemoryRepository);
+jest.mock('../patient/repository/patient-sql-repository.js');
+jest.mock('../queue/repository/queue-redis-repository.js');
+
+describe('queue service unit tests', () => {
   const patientName = 'Andrei';
   const patientID = '0e84252b-6af5-417f-aedd-90e50d5682cb';
   const patientData = {
@@ -15,46 +22,51 @@ describe('queueRepository service unit tests', () => {
   };
 
   test('method get', async () => {
-    queueInmemoryRepository.get.mockResolvedValue(patientID);
-    patientInmemoryRepository.getById.mockResolvedValue(patientData);
+    queueRedisRepository.get.mockResolvedValue(patientID);
+    patientSqlRepository.getById.mockResolvedValue(patientData);
     const res = await queueService.get();
     expect(res).toEqual('Andrei');
   });
 
   test('method get(queueRepository is empty)', async () => {
-    queueInmemoryRepository.get.mockResolvedValue(false);
-    patientInmemoryRepository.getById.mockResolvedValue(false);
+    queueRedisRepository.get.mockResolvedValue(false);
+    patientSqlRepository.getById.mockResolvedValue(false);
     const res = await queueService.get();
-    expect(res).toEqual(undefined);
+    expect(res).toBeFalsy();
   });
 
   test('method add', async () => {
-    patientInmemoryRepository.add.mockResolvedValue(patientID);
-    queueInmemoryRepository.add.mockResolvedValue(patientID);
+    queueRedisRepository.add.mockResolvedValue(patientID);
     const res = await queueService.add(patientName);
-    expect(res).toEqual(patientName);
+    expect(res).toEqual(patientID);
+  });
+
+  test('method add(redis disconnect)', async () => {
+    queueRedisRepository.add.mockResolvedValue(undefined);
+    const res = await queueService.add(patientName);
+    expect(res).toEqual(false);
   });
 
   test('method delete', async () => {
-    queueInmemoryRepository.delete.mockResolvedValue(patientID);
+    queueRedisRepository.delete.mockResolvedValue(patientID);
     const res = await queueService.delete();
     expect(res).toEqual(patientID);
   });
 
   test('method delete(queueRepository is empty)', async () => {
-    queueInmemoryRepository.delete.mockResolvedValue(false);
+    queueRedisRepository.delete.mockResolvedValue(false);
     const res = await queueService.delete(patientName);
     expect(res).toEqual(false);
   });
 
   test('method getLength', async () => {
-    queueInmemoryRepository.getLength.mockResolvedValue(3);
+    queueRedisRepository.getLength.mockResolvedValue(3);
     const res = await queueService.getLength();
     expect(res).toEqual(3);
   });
 
   test('method getLength(queueRepository is empty)', async () => {
-    queueInmemoryRepository.getLength.mockResolvedValue(0); // empty
+    queueRedisRepository.getLength.mockResolvedValue(0); // empty
     const res = await queueService.getLength();
     expect(res).toEqual(0);
   });

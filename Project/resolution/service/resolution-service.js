@@ -15,6 +15,8 @@ export default class ResolutionService {
       if (patientsList.length === 0) {
         return res;
       }
+
+      console.log(patientsList);
       res = [];
       for (const elem of patientsList) {
         const result = await this.resolutionRepository.getByPatientId(elem.patientId);
