@@ -47,6 +47,8 @@ describe('user service unit test', () => {
 
   test('registration test', async () => {
     userSqlRepository.checkEmail.mockResolvedValue(false);
+    bcrypt.genSaltSync.mockResolvedValue(10);
+    bcrypt.hashSync.mockResolvedValue(1111);
     userSqlRepository.add.mockResolvedValue(userData);
     patientSqlRepository.add.mockResolvedValue(patientData);
     userService.login.mockResolvedValue('111');
