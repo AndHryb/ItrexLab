@@ -3,7 +3,6 @@ import SequelizeMock from 'sequelize-mock';
 import UserService from '../users/service/user-service.js';
 import UserSqlRepository from '../users/repository/user-sql-repository.js';
 import PatientSqlRepository from '../patient/repository/patient-sql-repository.js';
-
 import decodeToken from '../helpers/decode-token.js';
 
 const patientsSQLDBMock = new SequelizeMock();
@@ -47,7 +46,7 @@ describe('user service unit test', () => {
   };
 
   test('registration test', async () => {
-    userSqlRepository.checkEmail.mockResolvedValue(userData.email);
+    userSqlRepository.checkEmail.mockResolvedValue(false);
     userSqlRepository.add.mockResolvedValue(userData);
     patientSqlRepository.add.mockResolvedValue(patientData);
     userService.login.mockResolvedValue('111');
