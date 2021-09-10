@@ -8,6 +8,7 @@ export default function patientModel(sequelize) {
       type: DataTypes.UUID,
       defaultValue: UUIDV4,
       primaryKey: true,
+      allowNull: false,
     },
 
     name: {
@@ -21,7 +22,7 @@ export default function patientModel(sequelize) {
     },
   });
 
-  sequelize.sync({ force: true })
+  model.sync({ force: true })
     .then(() => console.log('patientSQLDB table has been successfully created, if one doesn\'t exist'))
     .catch((error) => console.log('This error occurred', error));
 

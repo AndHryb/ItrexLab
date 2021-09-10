@@ -1,8 +1,6 @@
 import { authClient } from './auth-api.js';
-authClient.getCookieToken();
 
-console.log('check token doktor page>>>>');
-console.log(authClient.token);
+authClient.getCookieToken();
 
 const displayPatientNameForDoctor = document.getElementById('display_patient_name_for_doctor');
 const nextBtnForDoctor = document.getElementById('next_btn');
@@ -22,11 +20,19 @@ function arrSerialize(arr) {
   }
 
   let value = '';
+
   for (const elem of arr) {
+    let resolutionStr = '';
+    elem.resolutions.forEach((elem, i) => {
+      const result = `
+        resolution = ${elem.resolution}
+        resolutionId = ${elem.id}
+        `;
+      resolutionStr += result;
+    });
     const str = `
     name: ${elem.name},
-    resolution: ${elem.resolution},
-    resoluton ID: ${elem.id},
+    resolutions :{ ${resolutionStr} }
     registration date: ${new Date(elem.regTime)}
     `;
     value += str;
@@ -37,7 +43,7 @@ function arrSerialize(arr) {
 
 async function gettCurrent() {
   try {
-    const response = await authClient.client.get('/patient/next_in_queue');
+    const response = await authClient.client.get('/patient/next-in-queue');
     const data = await response.data;
     return data;
   } catch (err) {
@@ -47,7 +53,7 @@ async function gettCurrent() {
 
 nextBtnForDoctor.addEventListener('click', async () => {
   try {
-    const response = await authClient.client.get('/patient/next_in_queue');
+    const response = await authClient.client.get('/patient/next-in-queue');
     const data = await response.data;
     displayPatientNameForDoctor.textContent = data;
   } catch (err) {
@@ -75,9 +81,8 @@ addBtnForResolution.addEventListener('click', async () => {
 
 showResolutionBtn.addEventListener('click', async () => {
   try {
-    const response = await authClient.client.get(`/doctor/resolution_patient/${inputForSearchResolution.value}`);
+    const response = await authClient.client.get(`/doctor/resolution-patient?name=${inputForSearchResolution.value}`);
     const data = await response.data;
-    console.log(data);
     textAreaForResolution.value = arrSerialize(data.resolutions) || data.message;
   } catch (err) {
     console.log('Request failed', err);
@@ -85,10 +90,9 @@ showResolutionBtn.addEventListener('click', async () => {
 });
 deleteResolutionBtn.addEventListener('click', async () => {
   try {
-    const response = await authClient.client.delete('/doctor/resolution', { data: { value: deleteResolutionID.value }});
+    const response = await authClient.client.delete('/doctor/resolution', { data: { value: deleteResolutionID.value } });
     const data = await response.data;
     textAreaForResolution.value = data.message;
-    console.log(data.message);
     setTimeout(() => {
       textAreaForResolution.value = '';
     }, 1000);

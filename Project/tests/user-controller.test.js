@@ -1,12 +1,11 @@
+import SequelizeMock from 'sequelize-mock';
 import { STATUSES } from '../constants.js';
-import UserController from '../users/controller/user-controller.js';
-import UserService from '../users/service/user-service.js';
-import UserSqlRepository from '../users/repository/user-sql-repository.js';
-import PatientSqlRepository from '../patient/repository/patient-sql-repository.js';
-import sequelizeInit from '../config-data-bases/sequelize/sequelize-init.js';
+import UserController from '../api/auth/controller/user-controller.js';
+import UserService from '../api/auth/service/user-service.js';
+import UserSqlRepository from '../api/auth/repository/user-sql-repository.js';
+import PatientSqlRepository from '../api/patient/repository/patient-sql-repository.js';
 
-const sequelize = sequelizeInit();
-const { usersSQLDB, patientsSQLDB } = sequelize.models;
+const { usersSQLDB, patientsSQLDB } = new SequelizeMock();
 
 const userSqlRepository = new UserSqlRepository(usersSQLDB);
 const patientSqlRepository = new PatientSqlRepository(patientsSQLDB);
@@ -15,7 +14,7 @@ const userController = new UserController(userService);
 
 jest.mock('../users/service/user-service.js');
 
-describe('resolution controller unit test', () => {
+describe('user controller unit test', () => {
   const registrationData = {
     email: 'andryigr@gmail.com',
     password: '1111',
@@ -27,11 +26,18 @@ describe('resolution controller unit test', () => {
     email: 'andryigr@gmail.com',
     password: '1111',
   };
+  let resData;
 
   beforeEach(() => {
+    resData = {
+      email: true,
+      password: true,
+      token: undefined,
+    };
   });
 
   test('registration(all ok)', async () => {
+    resData.token = '--token--';
     userService.registration.mockResolvedValue('--token--');
     const res = await userController.registration(registrationData);
     expect(res.status)
@@ -52,7 +58,8 @@ describe('resolution controller unit test', () => {
   });
 
   test('login(all ok)', async () => {
-    userService.login.mockResolvedValue('--token--');
+    resData.token = '--token--';
+    userService.login.mockResolvedValue(resData);
     const res = await userController.login(loginData);
     expect(res.status)
       .toEqual(STATUSES.OK);
@@ -60,38 +67,24 @@ describe('resolution controller unit test', () => {
       .toEqual('--token--');
     expect(res.value.message)
       .toEqual('OK');
-    expect(res.value.token)
-      .toEqual('--token--');
   });
 
   test('login(email not found)', async () => {
-    userService.login.mockResolvedValue('email!');
+    resData.email = false;
+    userService.login.mockResolvedValue(resData);
     const res = await userController.login(loginData);
-    expect(res.status)
-      .toEqual(STATUSES.NotFound);
-    expect(res.value.token)
-      .toBeFalsy();
-    expect(res.value.message)
-      .toEqual(`the login ${loginData.email} was not found in the database`);
-  });
-
-  test('login(email not found)', async () => {
-    userService.login.mockResolvedValue('email!');
-    const res = await userController.login(loginData);
-    expect(res.status)
-      .toEqual(STATUSES.NotFound);
-    expect(res.value.token)
-      .toBeFalsy();
-    expect(res.value.message)
-      .toEqual(`the login ${loginData.email} was not found in the database`);
+    expect(res.status).toEqual(STATUSES.Unauthorized);
+    expect(res.value.token).toBeFalsy();
+    expect(res.value.message).toEqual(`the email ${loginData.email} was not found in the database`);
   });
 
   test('login(the passwords don\'t match)', async () => {
-    userService.login.mockResolvedValue('password!');
+    resData.email = true;
+    resData.password = false;
+    userService.login.mockResolvedValue(resData);
     const res = await userController.login(loginData);
     expect(res.status).toEqual(STATUSES.Unauthorized);
     expect(res.value.token).toBeFalsy();
     expect(res.value.message).toEqual(`the password for ${loginData.email}  don't match`);
-
   });
 });

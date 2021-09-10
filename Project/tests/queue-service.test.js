@@ -1,6 +1,6 @@
-import QueueService from '../queue/service/queue-service.js';
-import PatientSqlRepository from '../patient/repository/patient-sql-repository.js';
-import QueueRedisRepository from '../queue/repository/queue-redis-repository.js';
+import QueueService from '../api/queue/service/queue-service.js';
+import PatientSqlRepository from '../api/patient/repository/patient-sql-repository.js';
+import QueueRedisRepository from '../api/queue/repository/queue-redis-repository.js';
 import SequelizeMock from 'sequelize-mock';
 import redis from 'redis-mock';
 

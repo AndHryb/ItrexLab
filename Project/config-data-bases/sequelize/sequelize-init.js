@@ -8,7 +8,7 @@ import { envConfig } from '../../config.js';
 const { Sequelize } = pkg;
 
 export default function sequelizeInit() {
-  const sequelize = new Sequelize(process.env.SQL_DB, process.env.SQL_USER, process.env.SQL_PASSWORD, {
+  const sequelize = new Sequelize(process.env.SQL_DB, process.env.SQL_USER, process.env.SQL_PASSWORD , {
     dialect: 'mysql',
     host: envConfig.storage.SQLHost,
     port: envConfig.storage.SQLPort,
@@ -17,9 +17,9 @@ export default function sequelizeInit() {
 
   try {
     sequelize.authenticate();
-    console.log('Connection has been established successfully....');
+    console.log('Connection to mySQL has been established successfully....');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('Unable to connect to the database --->check sequelizeInit and config file', error);
   }
 
   const modelDefiners = [
@@ -33,6 +33,8 @@ export default function sequelizeInit() {
   }
 
   applyExtraSetup(sequelize);
+
+  sequelize.sync({force:true});
 
   return sequelize;
 }

@@ -18,20 +18,30 @@ class AuthApi {
   }
 
   async login(formData) {
-    const { data } = await this.client.post('/auth/login/form', formData);
-    console.log(data.token);
-    this.token = `${data.token}`;
-
-    return data.message;
+    try {
+      const { data } = await this.client.post('/auth/login', formData);
+      if (data.token) {
+        this.token = `${data.token}`;
+        return data.message;
+      }
+      return false;
+    } catch (err) {
+      console.log(`Error ${err.name}: ${err.message}`);
+    }
   }
 
   async registration(formData) {
-    const response = await this.client.post('/auth/registration/form', formData);
-    const data = await response.data;
-    console.log(data.token);
-    this.token = data.token;
-
-    return data.message;
+    try {
+      const response = await this.client.post('/auth/registration', formData);
+      const data = await response.data;
+      if (data.token) {
+        this.token = `${data.token}`;
+        return data.message;
+      }
+      return false;
+    } catch (err) {
+      console.log(`Error ${err.name}: ${err.message}`);
+    }
   }
 
   getCookieToken() {

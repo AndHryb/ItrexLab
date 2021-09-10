@@ -1,9 +1,9 @@
 import redis from 'redis-mock';
 import SequelizeMock from 'sequelize-mock';
-import ResolutionService from '../resolution/service/resolution-service.js';
-import ResolutionSqlRepository from '../resolution/repository/resolution-sql-repository.js';
-import PatientSqlRepository from '../patient/repository/patient-sql-repository.js';
-import QueueRedisRepository from '../queue/repository/queue-redis-repository';
+import ResolutionService from '../api/resolution/service/resolution-service.js';
+import ResolutionSqlRepository from '../api/resolution/repository/resolution-sql-repository.js';
+import PatientSqlRepository from '../api/patient/repository/patient-sql-repository.js';
+import QueueRedisRepository from '../api/queue/repository/queue-redis-repository';
 import { TTL } from '../constants.js';
 import decodeToken from '../helpers/decode-token';
 
@@ -24,13 +24,14 @@ jest.mock('../helpers/decode-token');
 describe('resolution service unit test', () => {
   let dataValues;
   let patientData1;
-  let patientData2;
   let patientList = [];
+  let patientList1 = [];
   const testRegTime = (new Date()).getTime();
+  const testRegTime2 = new Date();
+  const testRegTime3 = new Date(1000);
   const userID = '333';
   const resolutionId = '111';
   const patientId = '222';
-  const resolutionVal = 'schizophrenia';
 
   beforeEach(() => {
     dataValues = {
@@ -40,28 +41,91 @@ describe('resolution service unit test', () => {
       updatedAt: testRegTime,
       patientId: '222',
     };
+
     patientData1 = {
       name: 'Andrei',
       regTime: testRegTime,
     };
-    patientData2 = {
-      name: 'Bob',
-      regTime: testRegTime,
-    };
+
     patientList = [
       {
-        patientId: '222',
-        name: 'Andrei',
-        regTime: testRegTime,
-      },
-    ];
+        dataValues: {
+          id: '222',
+          name: 'Andrei',
+          gender: 'male',
+          birthday: '1993-02-19',
+          createdAt: testRegTime,
+          updatedAt: testRegTime,
+          userId: '333',
+          resolutionsSQLDBs: [{
+            dataValues: {
+              id: '111',
+              resolution: '1111',
+              createdAt: testRegTime2,
+              updatedAt: testRegTime2,
+              patientId: '222',
+            },
+          }],
+        },
+      }];
+    patientList1 = [
+      {
+        dataValues: {
+          id: '222',
+          name: 'Andrei',
+          gender: 'male',
+          birthday: '1993-02-19',
+          createdAt: testRegTime,
+          updatedAt: testRegTime,
+          userId: '333',
+          resolutionsSQLDBs: [{
+            dataValues: {
+              id: '111',
+              resolution: '1111',
+              createdAt: testRegTime3,
+              updatedAt: testRegTime3,
+              patientId: '222',
+            },
+          }],
+        },
+      }];
   });
 
   test('get resolutions by name', async () => {
     patientSqlRepository.getByName.mockResolvedValue(patientList);
-    resolutionSqlRepository.getByPatientId.mockResolvedValue(dataValues);
+
     const res = await resolutionService.getResolutionsByName('Andrei');
-    expect(res).toEqual([]);
+    expect(res).toEqual([{
+      name: 'Andrei',
+      regTime: testRegTime,
+      resolutions: [{
+        id: '111',
+        resolution: '1111',
+      }],
+    },
+    ]);
+  });
+
+  test('get resolutions by name out ttl', async () => {
+    patientSqlRepository.getByName.mockResolvedValue(patientList1);
+
+    const res = await resolutionService.getResolutionsByName('Andrei');
+    expect(res).toEqual([{
+      name: 'Andrei',
+      regTime: testRegTime,
+      resolutions: [{
+        id: '111',
+        resolution: 'The resolution for patient Andrei has expired',
+      }],
+    },
+    ]);
+  });
+
+  test('get resolutions by name (there is no match by name)', async () => {
+    patientSqlRepository.getByName.mockResolvedValue([]);
+
+    const res = await resolutionService.getResolutionsByName('Andrei');
+    expect(res).toEqual(false);
   });
 
   test('get resolution token', async () => {
@@ -113,6 +177,20 @@ describe('resolution service unit test', () => {
   test('delete resolution data(repository hasn\'t data)', async () => {
     resolutionSqlRepository.delete.mockResolvedValue(false);
     const res = await resolutionService.delete(resolutionId);
+    expect(res).toEqual(false);
+  });
+
+  test('add resolution ', async () => {
+    queueRedisRepository.getLength.mockResolvedValue(1);
+    queueRedisRepository.delete.mockResolvedValue('222');
+    const res = await resolutionService.addResolution('bla bla');
+    expect(res).toEqual('222');
+  });
+
+  test('add resolution (queue empty)', async () => {
+    queueRedisRepository.getLength.mockResolvedValue(0);
+    queueRedisRepository.delete.mockResolvedValue('222');
+    const res = await resolutionService.addResolution('bla bla');
     expect(res).toEqual(false);
   });
 });

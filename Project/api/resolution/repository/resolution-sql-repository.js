@@ -1,10 +1,11 @@
 export default class ResolutionSqlRepository {
-  constructor(model) {
-    this.model = model;
+  constructor(resolutions, patients) {
+    this.resolutionsModel = resolutions;
+    this.patientsModel = patients;
   }
 
   async add(patientId, resolution) {
-    const createdResolution = await this.model.create({
+    const createdResolution = await this.resolutionsModel.create({
       patientId,
       resolution,
     });
@@ -12,7 +13,7 @@ export default class ResolutionSqlRepository {
   }
 
   async getById(resolutionId) {
-    const resolution = await this.model.findOne({
+    const resolution = await this.resolutionsModel.findOne({
       where: {
         id: resolutionId,
       },
@@ -21,7 +22,7 @@ export default class ResolutionSqlRepository {
   }
 
   async getByPatientId(patientId) {
-    const reqResolution = await this.model.findOne({
+    const reqResolution = await this.resolutionsModel.findOne({
       where: {
         patientId,
       },
@@ -34,11 +35,21 @@ export default class ResolutionSqlRepository {
   }
 
   async delete(resolutionId) {
-    const deleteValue = await this.model.destroy({
+    const deleteValue = await this.resolutionsModel.destroy({
       where: {
         id: resolutionId,
       },
     });
     return deleteValue;
+  }
+
+  async getByName(name) {
+    const patientlist = await this.resolutionsModel.findAll({
+      where: {
+        name,
+      },
+      include: this.patientsModel,
+    });
+    return patientlist;
   }
 }

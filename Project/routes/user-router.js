@@ -3,8 +3,11 @@ import path from 'path';
 import Ajv from 'ajv';
 import { __dirname } from '../main.js';
 import { injector } from '../injector.js';
-import { checkNameSchema } from '../helpers/validation-schems-ajv/checkName.js';
+import { checkRegistrationFormShema } from '../helpers/validation-schems-ajv/checkRegistratioForm.js';
+import { checkLoginFormShema } from '../helpers/validation-schems-ajv/checkLoginForm.js';
 import { STATUSES } from '../constants.js';
+
+const ajv = new Ajv();
 
 const userRouter = express.Router();
 const userController = injector.getUserController();
@@ -22,14 +25,20 @@ userRouter.get('/username', async (req, res) => {
   res.status(result.status).json(result.value);
 });
 
-userRouter.post('/registration/form', async (req, res) => {
-  console.log(req.body);
+userRouter.post('/registration', async (req, res, next) => {
+  if (ajv.validate(checkRegistrationFormShema, req.body)) {
+    next();
+  } else { res.status(STATUSES.BadRequest).json('Fill out the form with the correct data'); }
+}, async (req, res) => {
   const result = await userController.registration(req.body);
   res.status(result.status).json(result.value);
 });
 
-userRouter.post('/login/form', async (req, res) => {
-  console.log(req.body);
+userRouter.post('/login', async (req, res, next) => {
+  if (ajv.validate(checkLoginFormShema, req.body)) {
+    next();
+  } else { res.status(STATUSES.BadRequest).json('Fill out the form with the correct data'); }
+}, async (req, res) => {
   const result = await userController.login(req.body);
   res.status(result.status).json(result.value);
 });

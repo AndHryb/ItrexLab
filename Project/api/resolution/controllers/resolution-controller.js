@@ -1,5 +1,5 @@
-import { STATUSES } from '../../constants.js';
-import Request from '../../helpers/request.js';
+import { STATUSES } from '../../../constants.js';
+import Request from '../../../helpers/request.js';
 
 export default class ResolutionController {
   constructor(resolutionService) {
@@ -31,7 +31,7 @@ export default class ResolutionController {
     const res = new Request();
     const result = await this.resolutionService.getResolutionByToken(token);
     if (!result) {
-      res.status = STATUSES.OK;
+      res.status = STATUSES.NotFound;
       res.value = {
         message: 'The resolution not found in the database.Make an appointment with a doctor.',
       };
@@ -50,7 +50,7 @@ export default class ResolutionController {
     const result = await this.resolutionService.addResolution(reqBody);
 
     if (!result) {
-      res.status = STATUSES.PreconditionFailed;
+      res.status = STATUSES.Conflict;
       res.value = {
         message: 'Can\'t added resolution. There is no one in the queueRepository',
       };
