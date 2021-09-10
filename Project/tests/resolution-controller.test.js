@@ -10,7 +10,7 @@ const resolutionSqlRepository = new ResolutionSqlRepository(resolutionsSQLDB);
 const resolutionService = new ResolutionService(resolutionSqlRepository);
 const resolutionController = new ResolutionController(resolutionService);
 
-jest.mock('../resolution/service/resolution-service.js');
+jest.mock('../api/resolution/service/resolution-service.js');
 
 describe('resolution controller unit test', () => {
   let resolutionData1;

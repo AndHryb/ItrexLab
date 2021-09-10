@@ -13,9 +13,8 @@ const patientSqlRepository = new PatientSqlRepository(patientsSQLDBMock);
 const userSqlRepository = new UserSqlRepository(usersSQLDBMock);
 const userService = new UserService(userSqlRepository, patientSqlRepository);
 
-// jest.mock('../users/service/user-service.js');
-jest.mock('../users/repository/user-sql-repository.js');
-jest.mock('../patient/repository/patient-sql-repository.js');
+jest.mock('../api/auth/repository/user-sql-repository.js');
+jest.mock('../api/patient/repository/patient-sql-repository.js');
 jest.mock('../helpers/decode-token.js');
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
