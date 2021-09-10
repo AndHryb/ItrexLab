@@ -15,8 +15,8 @@ const queueService = new QueueService(queueRedisRepository);
 const userService = new UserService(userSqlRepository);
 const queueController = new QueueController(queueService, userService);
 
-jest.mock('../users/service/user-service.js');
-jest.mock('../queue/service/queue-service.js');
+jest.mock('../api/auth/service/user-service.js');
+jest.mock('../api/queue/service/queue-service.js');
 
 
 describe('queue controller unit tests', () => {

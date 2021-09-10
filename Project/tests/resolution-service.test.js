@@ -16,9 +16,9 @@ const patientSqlRepository = new PatientSqlRepository(patientsSQLDBMock);
 const queueRedisRepository = new QueueRedisRepository(client);
 const resolutionService = new ResolutionService(queueRedisRepository, resolutionSqlRepository, patientSqlRepository, TTL);
 
-jest.mock('../resolution/repository/resolution-sql-repository.js');
-jest.mock('../patient/repository/patient-sql-repository.js');
-jest.mock('../queue/repository/queue-redis-repository');
+jest.mock('../api/resolution/repository/resolution-sql-repository.js');
+jest.mock('../api/patient/repository/patient-sql-repository.js');
+jest.mock('../api/queue/repository/queue-redis-repository');
 jest.mock('../helpers/decode-token');
 
 describe('resolution service unit test', () => {

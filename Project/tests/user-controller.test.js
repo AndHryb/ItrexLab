@@ -12,7 +12,7 @@ const patientSqlRepository = new PatientSqlRepository(patientsSQLDB);
 const userService = new UserService(userSqlRepository, patientSqlRepository);
 const userController = new UserController(userService);
 
-jest.mock('../users/service/user-service.js');
+jest.mock('../api/auth/service/user-service.js');
 
 describe('user controller unit test', () => {
   const registrationData = {

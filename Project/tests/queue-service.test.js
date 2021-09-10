@@ -10,8 +10,8 @@ const patientSqlRepository = new PatientSqlRepository(patientsSQLDBMock);
 const queueRedisRepository = new QueueRedisRepository(client);
 const queueService = new QueueService(patientSqlRepository, queueRedisRepository);
 
-jest.mock('../patient/repository/patient-sql-repository.js');
-jest.mock('../queue/repository/queue-redis-repository.js');
+jest.mock('../api/patient/repository/patient-sql-repository.js');
+jest.mock('../api/queue/repository/queue-redis-repository.js');
 
 describe('queue service unit tests', () => {
   const patientName = 'Andrei';
