@@ -1,5 +1,5 @@
-import { STATUSES } from '../../constants.js';
-import Request from '../../helpers/request.js';
+import { STATUSES } from '../../../constants.js';
+import Request from '../../../helpers/request.js';
 
 export default class UserController {
   constructor(userService) {
@@ -30,31 +30,33 @@ export default class UserController {
   async login(data) {
     const res = new Request();
     const result = await this.userService.login(data);
-    if (result === 'email!') {
-      res.status = STATUSES.NotFound;
+    if (!result.email) {
+      res.status = STATUSES.Unauthorized;
       res.value = {
-        message: `the login ${data.email} was not found in the database`,
+        message: `the email ${data.email} was not found in the database`,
       };
       return res;
     }
-    if (result === 'password!') {
+    if (!result.password) {
       res.status = STATUSES.Unauthorized;
       res.value = {
         message: `the password for ${data.email}  don't match`,
       };
       return res;
     }
-    res.status = STATUSES.OK;
-    res.value = {
-      message: 'OK',
-      token: result,
-    };
+    if (result.token) {
+      res.status = STATUSES.OK;
+      res.value = {
+        message: 'OK',
+        token: result.token,
+      };
+    }
     return res;
   }
 
   async getByToken(token) {
     const res = new Request();
-    const result = await this.userService.getByToken(token);
+    const result = await this.userService.getPatientByToken(token);
     if (!result) {
       res.status = STATUSES.ServerError;
       res.value = {

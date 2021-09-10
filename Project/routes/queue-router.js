@@ -1,17 +1,13 @@
 import express from 'express';
 import path from 'path';
-import Ajv from 'ajv';
 import events from 'events';
 import * as cookie from 'cookie';
 import { injector } from '../injector.js';
 const __dirname = path.resolve();
 
-import { checkNameSchema } from '../helpers/validation-schems-ajv/checkName.js';
-import { STATUSES } from '../constants.js';
 
 const emitter = new events.EventEmitter();
 const queueRouter = express.Router();
-const ajv = new Ajv();
 const queueController = injector.getQueueController();
 const userController = injector.getUserController();
 
@@ -37,15 +33,14 @@ queueRouter.get('/connect', (req, res) => {
   });
 });
 
-queueRouter.get('/next_in_queue', async (req, res) => {
+queueRouter.get('/next-in-queue', async (req, res) => {
   const result = await queueController.getNext();
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
   emitter.emit('next', result.value);
 });
 
-queueRouter.get('/in_queue', async (req, res) => {
-  console.log(req.headers.authorization);
+queueRouter.post('/in-queue', async (req, res) => {
   const result = await queueController.addToQueue(req.headers.authorization);
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);

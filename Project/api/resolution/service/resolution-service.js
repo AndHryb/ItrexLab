@@ -1,4 +1,4 @@
-import decodeToken from '../../helpers/decode-token.js';
+import decodeToken from '../../../helpers/decode-token.js';
 
 export default class ResolutionService {
   constructor(queueRepository, resolutionRepository, patientRepository, TTL) {
@@ -17,25 +17,31 @@ export default class ResolutionService {
       }
 
       res = [];
-      for (const elem of patientsList) {
-        const {dataValues} = await this.resolutionRepository.getByPatientId(elem.patientId);
-        if (!dataValues) {
-          continue;
-        }
 
-        if (this.TTL < (new Date()).getTime() - (new Date(dataValues.createdAt)).getTime()) {
-          dataValues.resolution = `The resolution for patient ${elem.name} has expired`;
-        }
+      patientsList.forEach((elem, i) => {
+        const { dataValues } = elem;
 
-        if (dataValues.resolution) {
-          res.push({
-            name: elem.name,
-            id: dataValues.id,
-            resolution: dataValues.resolution,
-            regTime: elem.regTime,
-          });
+        const resolutionsForThisPatient = [];
+
+        dataValues.resolutionsSQLDBs.forEach((resElem, i) => {
+          let resolutionValue;
+          if (this.TTL < (new Date()).getTime() - (new Date(resElem.dataValues.createdAt)).getTime()) {
+            resolutionValue = `The resolution for patient ${elem.dataValues.name} has expired`;
+          } else { resolutionValue = resElem.dataValues.resolution; }
+          resolutionsForThisPatient[i] = {
+            resolution: resolutionValue,
+            id: resElem.dataValues.id,
+          };
+        });
+
+        if (resolutionsForThisPatient.length !== 0) {
+          res[i] = {
+            name: dataValues.name,
+            resolutions: resolutionsForThisPatient,
+            regTime: dataValues.createdAt,
+          };
         }
-      }
+      });
 
       return res;
     } catch (err) {
@@ -56,18 +62,18 @@ export default class ResolutionService {
   }
 
   async addResolution(resolution) {
-    const res = false;
     try {
       const queueLength = await this.queueRepository.getLength();
       if (queueLength === 0) {
-        return res;
+        return false;
       }
-      const nextInQueuePatientName = await this.queueRepository.delete();
-      const result = await this.resolutionRepository.add(nextInQueuePatientName, resolution);
-      const patientData = await this.patientRepository.getById(nextInQueuePatientName);
-      if (result) {
-        return patientData;
+      const patientId = await this.queueRepository.delete();
+      if (!patientId){
+        return false
       }
+      await this.resolutionRepository.add(patientId, resolution);
+
+      return patientId;
     } catch (err) {
       console.log(`Resolution service getByID error :${err.name} : ${err.message}`);
     }

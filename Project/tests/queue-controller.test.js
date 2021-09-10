@@ -1,15 +1,15 @@
 import { STATUSES } from '../constants.js';
-import QueueController from '../queue/controllers/queue-controller.js';
-import QueueService from '../queue/service/queue-service.js';
-import UserService from '../users/service/user-service.js';
-import QueueRedisRepository from '../queue/repository/queue-redis-repository.js';
-import UserSqlRepository from '../users/repository/user-sql-repository.js';
-import redisInit from '../config-data-bases/redis/redis-init.js';
-import sequelizeInit from '../config-data-bases/sequelize/sequelize-init.js';
-const sequelize = sequelizeInit();
-const { usersSQLDB } = sequelize.models;
+import QueueController from '../api/queue/controllers/queue-controller.js';
+import QueueService from '../api/queue/service/queue-service.js';
+import UserService from '../api/auth/service/user-service.js';
+import QueueRedisRepository from '../api/queue/repository/queue-redis-repository.js';
+import UserSqlRepository from '../api/auth/repository/user-sql-repository.js';
+import redis from 'redis-mock';
+import SequelizeMock from 'sequelize-mock';
 
-const queueRedisRepository = new QueueRedisRepository(redisInit());
+const usersSQLDB = new SequelizeMock();
+const client = redis.createClient();
+const queueRedisRepository = new QueueRedisRepository(client);
 const userSqlRepository = new UserSqlRepository(usersSQLDB);
 const queueService = new QueueService(queueRedisRepository);
 const userService = new UserService(userSqlRepository);
@@ -19,7 +19,7 @@ jest.mock('../users/service/user-service.js');
 jest.mock('../queue/service/queue-service.js');
 
 
-describe('queueRepository controller unit tests', () => {
+describe('queue controller unit tests', () => {
 
 
   test('first in queueRepository patient(queueRepository not empty)', async () => {
@@ -37,10 +37,10 @@ describe('queueRepository controller unit tests', () => {
   });
 
   test('add in queueRepository', async () => {
-    userService.getByToken.mockResolvedValue({id: 123, name: 'Andrei'});
+    userService.getPatientByToken.mockResolvedValue({id: 123, name: 'Andrei'});
     queueService.add.mockResolvedValue('someName');
     const res = await queueController.addToQueue('someToken');
-    expect(res.status).toEqual(STATUSES.Created);
+    expect(res.status).toEqual(STATUSES.OK);
     expect(res.value).toEqual({
       message: `patient Andrei added to the queue`,
       patient: {id: 123, name: 'Andrei'},

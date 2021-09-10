@@ -1,13 +1,13 @@
-import QueueController from './queue/controllers/queue-controller.js';
-import ResolutionController from './resolution/controllers/resolution-controller.js';
-import UserController from './users/controller/user-controller.js';
-import QueueService from './queue/service/queue-service.js';
-import ResolutionService from './resolution/service/resolution-service.js';
-import UserService from './users/service/user-service.js';
-import QueueRedisRepository from './queue/repository/queue-redis-repository.js';
-import ResolutionSqlRepository from './resolution/repository/resolution-sql-repository.js';
-import PatientSqlRepository from './patient/repository/patient-sql-repository.js';
-import UserSqlRepository from './users/repository/user-sql-repository.js';
+import QueueController from './api/queue/controllers/queue-controller.js';
+import ResolutionController from './api/resolution/controllers/resolution-controller.js';
+import UserController from './api/auth/controller/user-controller.js';
+import QueueService from './api/queue/service/queue-service.js';
+import ResolutionService from './api/resolution/service/resolution-service.js';
+import UserService from './api/auth/service/user-service.js';
+import QueueRedisRepository from './api/queue/repository/queue-redis-repository.js';
+import ResolutionSqlRepository from './api/resolution/repository/resolution-sql-repository.js';
+import PatientSqlRepository from './api/patient/repository/patient-sql-repository.js';
+import UserSqlRepository from './api/auth/repository/user-sql-repository.js';
 import sequelizeInit from './config-data-bases/sequelize/sequelize-init.js';
 import redisInit from './config-data-bases/redis/redis-init.js';
 import { TTL } from './constants.js';
@@ -17,8 +17,8 @@ class Injector {
   constructor() {
     const sequelize = sequelizeInit();
     const { resolutionsSQLDB, patientsSQLDB, usersSQLDB } = sequelize.models;
-    this.resolutionRepository = new ResolutionSqlRepository(resolutionsSQLDB);
-    this.patientRepository = new PatientSqlRepository(patientsSQLDB);
+    this.resolutionRepository = new ResolutionSqlRepository(resolutionsSQLDB,patientsSQLDB);
+    this.patientRepository = new PatientSqlRepository(patientsSQLDB,resolutionsSQLDB);
     this.userRepository = new UserSqlRepository(usersSQLDB);
     const client = redisInit();
     this.queueRepository = new QueueRedisRepository(client);

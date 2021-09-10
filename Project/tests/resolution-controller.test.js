@@ -1,12 +1,11 @@
-import { STATUSES, TTL } from '../constants.js';
-import ResolutionController from '../resolution/controllers/resolution-controller.js';
-import ResolutionService from '../resolution/service/resolution-service.js';
-import ResolutionSqlRepository from '../resolution/repository/resolution-sql-repository.js';
-import sequelizeInit from '../config-data-bases/sequelize/sequelize-init.js';
+import { STATUSES} from '../constants.js';
+import ResolutionController from '../api/resolution/controllers/resolution-controller.js';
+import ResolutionService from '../api/resolution/service/resolution-service.js';
+import ResolutionSqlRepository from '../api/resolution/repository/resolution-sql-repository.js';
+import SequelizeMock from 'sequelize-mock';
 
-const sequelize = sequelizeInit();
-const { resolutionsSQLDB } = sequelize.models;
 
+const resolutionsSQLDB = new SequelizeMock();
 const resolutionSqlRepository = new ResolutionSqlRepository(resolutionsSQLDB);
 const resolutionService = new ResolutionService(resolutionSqlRepository);
 const resolutionController = new ResolutionController(resolutionService);
@@ -79,7 +78,7 @@ describe('resolution controller unit test', () => {
   test('add resolution data(queue empty hasn\'t patient)', async () => {
     resolutionService.addResolution.mockResolvedValue(false);
     const res = await resolutionController.addResolution(resolutionVal);
-    expect(res.status).toEqual(STATUSES.PreconditionFailed);
+    expect(res.status).toEqual(STATUSES.Conflict);
     expect(res.value.message).toEqual('Can\'t added resolution. There is no one in the queueRepository');
   });
 
@@ -107,7 +106,7 @@ describe('resolution controller unit test', () => {
   test('get resolution by token (token invalid)', async () => {
     resolutionService.getResolutionByToken.mockResolvedValue(false);
     const res = await resolutionController.getResolutionByToken(resolutionId);
-    expect(res.status).toEqual(STATUSES.OK);
+    expect(res.status).toEqual(STATUSES.NotFound);
     expect(res.value.message).toEqual('The resolution not found in the database.Make an appointment with a doctor.');
   });
 });

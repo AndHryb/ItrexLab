@@ -5,9 +5,7 @@ const { DataTypes } = pkg;
 export default function applyExtraSetup(sequelize) {
   const { resolutionsSQLDB, patientsSQLDB, usersSQLDB } = sequelize.models;
 
-  //patientsSQLDB.hasMany(resolutionsSQLDB);
-
-  resolutionsSQLDB.belongsTo(patientsSQLDB, {
+  patientsSQLDB.hasMany(resolutionsSQLDB, {
     foreignKey: {
       name: 'patientId',
       type: DataTypes.UUID,
@@ -15,13 +13,15 @@ export default function applyExtraSetup(sequelize) {
     },
   });
 
-  //usersSQLDB.hasOne(patientsSQLDB);
+  resolutionsSQLDB.belongsTo(patientsSQLDB);
 
-  patientsSQLDB.belongsTo(usersSQLDB, {
+  usersSQLDB.hasOne(patientsSQLDB, {
     foreignKey: {
       name: 'userId',
       type: DataTypes.UUID,
       allowNull: false,
     },
   });
+
+  patientsSQLDB.belongsTo(usersSQLDB);
 }

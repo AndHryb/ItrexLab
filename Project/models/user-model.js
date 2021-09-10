@@ -8,6 +8,7 @@ export default function userModel(sequelize) {
       type: DataTypes.UUID,
       defaultValue: UUIDV4,
       primaryKey: true,
+      allowNull: false,
     },
 
     email: {
@@ -18,7 +19,7 @@ export default function userModel(sequelize) {
     },
   });
 
-  sequelize.sync({ force: true })
+  model.sync({ force: true })
     .then(() => console.log('usersSQLDB table has been successfully created, if one doesn\'t exist'))
     .catch((error) => console.log('This error occurred', error));
 

@@ -1,5 +1,5 @@
-import { STATUSES } from '../../constants.js';
-import Request from '../../helpers/request.js';
+import { STATUSES } from '../../../constants.js';
+import Request from '../../../helpers/request.js';
 
 export default class QueueController {
   constructor(queueService, userService) {
@@ -9,22 +9,14 @@ export default class QueueController {
 
   async addToQueue(token) {
     const res = new Request();
-    const result = await this.userService.getByToken(token);
-    if (!result) {
-      res.value = {
-        message: 'Server Error, try logging in again',
-      };
-      res.status = STATUSES.ServerError;
-
-      return res;
-    }
+    const result = await this.userService.getPatientByToken(token);
     const addQueue = await this.queueService.add(result.id);
     if (addQueue) {
       res.value = {
         message: `patient ${result.name} added to the queue`,
         patient: result,
       };
-      res.status = STATUSES.Created;
+      res.status = STATUSES.OK;
 
       return res;
     }

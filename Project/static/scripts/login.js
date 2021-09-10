@@ -60,12 +60,12 @@ document.reg_form.onsubmit = async function (EO) {
   };
 
   try {
-    await authClient.login(formData);
+    const result = await authClient.login(formData);
     document.cookie = `token=${authClient.token};path=/;`;
-    window.location = 'http://localhost:3000/patient';
-
-
+    if(result){
+      window.location = 'http://localhost:3000/patient';
+    }
   } catch (err) {
-    console.log('Request failed', err);
+    console.log(`Request failed ${err.name} : ${err.message}`);
   }
 };
