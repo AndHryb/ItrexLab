@@ -24,9 +24,13 @@ userRouter.get('/doctor-login', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static', 'doctor-login.html'));
 });
 
-userRouter.post('/login/doctor', async (req, res) => {
+userRouter.post('/login/doctor', async (req, res, next) => {
+  if (ajv.validate(checkLoginFormShema, req.body)) {
+    next();
+  } else { res.status(STATUSES.BadRequest).json('Fill out the form with the correct data'); }
+}, async (req, res) => {
   const result = await userController.doctorLogin(req.body);
-  if (result.status === 200) res.cookie('doctorToken',`${result.value}`, {
+  if (result.status === 200) res.cookie('doctorToken', `${result.value}`, {
     httpOnly: true,
   });
 

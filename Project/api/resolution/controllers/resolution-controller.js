@@ -2,6 +2,7 @@ import { STATUSES } from '../../../constants.js';
 import Request from '../../../helpers/request.js';
 import checkJwtToken from '../../../helpers/decode-doctor-token.js';
 import { doctorController } from '../../../routes/resolution-router.js';
+import e from 'express';
 
 export default class ResolutionController {
   constructor(resolutionService) {
@@ -68,19 +69,29 @@ export default class ResolutionController {
     return res;
   }
 
-  async deleteResolution(reqBody) {
+  async deleteResolution(reqBody, doctorToken) {
     const res = new Request();
-    const result = await this.resolutionService.delete(reqBody);
 
-    if (!(result)) {
-      res.status = STATUSES.NotFound;
-      res.value = {
-        message: `The resolution ${reqBody} not found in the database`,
-      };
+    const { userId } = checkJwtToken(doctorToken);
+    const { id } = await doctorController.getByUserId(userId);
+    const result = await this.resolutionService.delete(reqBody, id);
+
+    if (result instanceof Error) {
+      if (result.message === 'not found') {
+        res.status = STATUSES.NotFound;
+        res.value = {
+          message: `The resolution ${reqBody} not found in the database`,
+        };
+      } else if (result.message === 'no right to delete') {
+        res.status = STATUSES.Forbidden;
+        res.value = {
+          message: 'You cant delete this resolution',
+        }
+      }
 
       return res;
     }
-    res.status = STATUSES.OK;
+    res.status = STATUSES.NoContent;
     res.value = {
       message: `The resolution  ${reqBody} deleted`,
     };

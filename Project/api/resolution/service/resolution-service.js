@@ -16,37 +16,11 @@ export default class ResolutionService {
         return res;
       }
 
-      return resolutionList;
-
-      /*
-      res = [];
-
-      patientsList.forEach((elem, i) => {
-        const { dataValues } = elem;
-
-        const resolutionsForThisPatient = [];
-
-        dataValues.resolutionsSQLDBs.forEach((resElem, i) => {
-          let resolutionValue;
-          if (this.TTL < (new Date()).getTime() - (new Date(resElem.dataValues.createdAt)).getTime()) {
-            resolutionValue = `The resolution for patient ${elem.dataValues.name} has expired`;
-          } else { resolutionValue = resElem.dataValues.resolution; }
-          resolutionsForThisPatient[i] = {
-            resolution: resolutionValue,
-            id: resElem.dataValues.id,
-          };
-        });
-
-        if (resolutionsForThisPatient.length !== 0) {
-          res[i] = {
-            name: dataValues.name,
-            resolutions: resolutionsForThisPatient,
-            regTime: dataValues.createdAt,
-          };
-        }
+      let resolutionListTTL = resolutionList.filter((elem) => {
+        return this.TTL > (new Date()).getTime() - (new Date(elem.createdAt)).getTime();
       });
 
-      return res;*/
+      return resolutionListTTL;
     } catch (err) {
       console.log(`Resolution service add error :${err.name} : ${err.message}`);
     }
@@ -98,12 +72,24 @@ export default class ResolutionService {
     }
   }
 
-  async delete(resolutionId) {
+  async delete(resolutionId, docId) {
     try {
+      const isTheRightDoc = await this.isTheRightDoctor(resolutionId, docId);
+      if (!isTheRightDoc) throw new Error('no right to delete');
       const result = await this.resolutionRepository.delete(resolutionId);
+
       return result;
     } catch (err) {
       console.log(`Resolution service delete error :${err.name} : ${err.message}`);
+      return err;
     }
+  }
+
+  async isTheRightDoctor(resolutionId, docId) {
+    const resolution = await this.getById(resolutionId);
+    if (!resolution) throw new Error('not found');
+
+    const { doctorId } = resolution;
+    return doctorId === docId;
   }
 }

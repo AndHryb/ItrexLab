@@ -32,7 +32,7 @@ export default class ResolutionSqlRepository {
       },
       include: [{
         model: this.doctorModel, as: 'doctor',
-        attributes: ['name'],
+        attributes: ['name', 'id'],
       }]
     });
     if (!reqResolution) {

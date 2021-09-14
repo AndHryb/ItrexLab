@@ -23,5 +23,5 @@ export const STATUSES = {
   Unavailable: 503,
 };
 
-const TTL = 10000; // 10 sec
+const TTL = 15000000;
 export { TTL };

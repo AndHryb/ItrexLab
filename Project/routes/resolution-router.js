@@ -7,7 +7,6 @@ import { STATUSES } from '../constants.js';
 import { checkResolutionSchema } from '../helpers/validation-schems-ajv/checkResolution.js';
 import { checkNameSchema } from '../helpers/validation-schems-ajv/checkName.js';
 import checkJwtToken from '../helpers/decode-doctor-token.js';
-import e from 'express';
 
 const __dirname = path.resolve();
 const resolutionRouter = express.Router();
@@ -62,7 +61,9 @@ resolutionRouter.delete('/resolution', async (req, res, next) => {
     next();
   } else { res.status(STATUSES.BadRequest).json('Incorrect patient name'); }
 }, async (req, res) => {
-  const result = await resolutionController.deleteResolution(req.body.value);
+  const cookies = cookie.parse(req.headers.cookie);
+  const { doctorToken } = cookies;
+  const result = await resolutionController.deleteResolution(req.body.value, doctorToken);
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
 });
@@ -77,8 +78,8 @@ resolutionRouter.get('/specialities', async(req, res) => {
   const { doctorToken } = cookies;
   const { userId } = checkJwtToken(doctorToken);
   const doctor = await doctorController.getByUserId(userId);
-  const spec = await doctorController.getSpec(doctor.id);
-  res.status(STATUSES.OK).json(spec);
+  const result = await doctorController.getSpec(doctor.id);
+  res.status(result.status).json(result.value);
 })
 
 export default resolutionRouter;

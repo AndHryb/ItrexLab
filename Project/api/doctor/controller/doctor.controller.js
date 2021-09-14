@@ -32,11 +32,18 @@ export default class DoctorController {
     }
 
     async getSpec(docId) {
+        const result = new Request();
         try {
             const res = await this.service.getSpec(docId);
-            return res.specialties;
+            result.status = STATUSES.OK;
+            result.value = res.specialties;
+
+            return result;
         } catch (err) {
             console.log(err);
+            result.status = STATUSES.NotFound;
+            result.value = err;
+
             return err;
         }
     }
