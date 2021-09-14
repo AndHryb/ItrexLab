@@ -5,37 +5,38 @@ export default class QueueRedisRepository {
     this.client = redisClient;
   }
 
-  async get() {
-    const listLength = await this.getLength();
+  async get(docId) {
+    const listLength = await this.getLength(docId);
     if (listLength === 0) {
       return false;
     }
     const firstInQueue = promisify(this.client.lindex).bind(this.client);
-    const result = await firstInQueue('queue', 0);
+    const result = await firstInQueue(docId, 0);
+    console.log(result);
     return result;
   }
 
-  async add(patientId) {
+  async add(patientId, docId) {
     const addResult = promisify(this.client.rpush).bind(this.client);
-    await addResult('queue', patientId);
+    await addResult(docId, patientId);
 
     return patientId;
   }
 
-  async delete() {
-    const listLength = await this.getLength();
+  async delete(docId) {
+    const listLength = await this.getLength(docId);
     if (listLength === 0) {
       return false;
     }
     const popResult = promisify(this.client.lpop).bind(this.client);
-    const result = await popResult('queue');
+    const result = await popResult(docId);
 
     return result;
   }
 
-  async getLength() {
+  async getLength(docId) {
     const listLength = promisify(this.client.llen).bind(this.client);
-    const result = await listLength('queue');
+    const result = await listLength(docId);
 
     return result;
   }

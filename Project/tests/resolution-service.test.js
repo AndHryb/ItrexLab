@@ -92,22 +92,19 @@ describe('resolution service unit test', () => {
   });
 
   test('get resolutions by name', async () => {
-    patientSqlRepository.getByName.mockResolvedValue(patientList);
+    resolutionSqlRepository.getByName.mockResolvedValue(patientList);
 
     const res = await resolutionService.getResolutionsByName('Andrei');
-    expect(res).toEqual([{
-      name: 'Andrei',
-      regTime: testRegTime,
-      resolutions: [{
-        id: '111',
-        resolution: '1111',
-      }],
-    },
-    ]);
-  });
 
+    expect(res[0].dataValues.id).toBe('222');
+    expect(res[0].dataValues.name).toBe('Andrei');
+    expect(res[0].dataValues.gender).toBe('male');
+    expect(res[0].dataValues.birthday).toBe('1993-02-19');
+    expect(res[0].dataValues.userId).toBe('333');
+  });
+  /*
   test('get resolutions by name out ttl', async () => {
-    patientSqlRepository.getByName.mockResolvedValue(patientList1);
+    resolutionSqlRepository.getByName.mockResolvedValue(patientList1);
 
     const res = await resolutionService.getResolutionsByName('Andrei');
     expect(res).toEqual([{
@@ -119,13 +116,13 @@ describe('resolution service unit test', () => {
       }],
     },
     ]);
-  });
+  });*/
 
   test('get resolutions by name (there is no match by name)', async () => {
-    patientSqlRepository.getByName.mockResolvedValue([]);
+    resolutionSqlRepository.getByName.mockResolvedValue([]);
 
     const res = await resolutionService.getResolutionsByName('Andrei');
-    expect(res).toEqual(false);
+    expect(res).toEqual([]);
   });
 
   test('get resolution token', async () => {

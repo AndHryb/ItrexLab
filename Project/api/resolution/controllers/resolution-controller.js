@@ -1,5 +1,7 @@
 import { STATUSES } from '../../../constants.js';
 import Request from '../../../helpers/request.js';
+import checkJwtToken from '../../../helpers/decode-doctor-token.js';
+import { doctorController } from '../../../routes/resolution-router.js';
 
 export default class ResolutionController {
   constructor(resolutionService) {
@@ -45,9 +47,12 @@ export default class ResolutionController {
     return res;
   }
 
-  async addResolution(reqBody) {
+  async addResolution(reqBody, docToken) {
     const res = new Request();
-    const result = await this.resolutionService.addResolution(reqBody);
+    const { userId } = checkJwtToken(docToken);
+    const doc = await doctorController.getByUserId(userId);
+
+    const result = await this.resolutionService.addResolution(reqBody.value, doc.id, reqBody.spec);
 
     if (!result) {
       res.status = STATUSES.Conflict;

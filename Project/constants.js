@@ -4,6 +4,9 @@ export const MIN_LENGTH = 2;
 
 export const MIN_PASSWORD_LENGTH = 4;
 
+export const WRONG_PASS_MSG = 'wrong password';
+
+export const WRONG_EMAIL_MSG = 'wrong email';
 
 export const STATUSES = {
   OK: 200,

@@ -11,11 +11,14 @@ export default class ResolutionService {
   async getResolutionsByName(name) {
     let res = false;
     try {
-      const patientsList = await this.patientRepository.getByName(name);
-      if (patientsList.length === 0) {
+      const resolutionList = await this.resolutionRepository.getByName(name);
+      if (!resolutionList) {
         return res;
       }
 
+      return resolutionList;
+
+      /*
       res = [];
 
       patientsList.forEach((elem, i) => {
@@ -43,7 +46,7 @@ export default class ResolutionService {
         }
       });
 
-      return res;
+      return res;*/
     } catch (err) {
       console.log(`Resolution service add error :${err.name} : ${err.message}`);
     }
@@ -54,24 +57,24 @@ export default class ResolutionService {
       const decoded = decodeToken(token);
       const patient = await this.patientRepository.getByUserId(decoded.userId);
       const result = await this.resolutionRepository.getByPatientId(patient.id);
-
       return result;
     } catch (err) {
       console.log(`Resolution service getByID error :${err.name} : ${err.message}`);
     }
   }
 
-  async addResolution(resolution) {
+  async addResolution(resolution, docId, spec) {
     try {
-      const queueLength = await this.queueRepository.getLength();
+      const queueLength = await this.queueRepository.getLength(docId);
       if (queueLength === 0) {
         return false;
       }
-      const patientId = await this.queueRepository.delete();
-      if (!patientId){
+      const patientId = await this.queueRepository.delete(docId);
+
+      if (!patientId) {
         return false
       }
-      await this.resolutionRepository.add(patientId, resolution);
+      await this.resolutionRepository.add({ patientId, resolution, docId, spec });
 
       return patientId;
     } catch (err) {

@@ -1,5 +1,7 @@
 import { STATUSES } from '../../../constants.js';
 import Request from '../../../helpers/request.js';
+import checkJwtToken from '../../../helpers/decode-doctor-token.js';
+import { doctorController } from '../../../routes/resolution-router.js';
 
 export default class QueueController {
   constructor(queueService, userService) {
@@ -7,38 +9,39 @@ export default class QueueController {
     this.userService = userService;
   }
 
-  async addToQueue(token) {
+  async addToQueue(token, docId) {
     const res = new Request();
-    const result = await this.userService.getPatientByToken(token);
-    const addQueue = await this.queueService.add(result.id);
-    if (addQueue) {
-      res.value = {
-        message: `patient ${result.name} added to the queue`,
-        patient: result,
-      };
-      res.status = STATUSES.OK;
+    try {
+      const { userId } = checkJwtToken(token);
+      const patient = await this.userService.getByUserId(userId);
+      if (!patient) throw (new Error('db error'));
+      const result = await this.queueService.add(patient.id, docId);
+      res.status = STATUSES.Created;
+      res.value = result;
+
+      return res;
+    } catch (err) {
+      res.status = STATUSES.ServerError;
+      res.value = err;
 
       return res;
     }
-    res.value = {
-      message: 'You are already standing in queue',
-    };
-    res.status = STATUSES.BadRequest;
 
-    return res;
   }
 
-  async getNext() {
+  async getNext(token) {
     const res = new Request();
-    const result = await this.queueService.get();
-
-    if (!result) {
-      res.status = STATUSES.NotFound;
-      res.value = 'The queue is empty';
-      return res;
-    }
-    res.value = result;
-    res.status = STATUSES.OK;
-    return res;
+    const { userId } = checkJwtToken(token);
+    const { id } = await doctorController.getByUserId(userId);
+    const result = await this.queueService.get(id);
+    
+        if (!result) {
+          res.status = STATUSES.NotFound;
+          res.value = 'The queue is empty';
+          return res;
+        }
+        res.value = result;
+        res.status = STATUSES.OK;
+        return res;
   }
 }

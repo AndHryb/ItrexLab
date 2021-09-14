@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import decodeToken from '../../../helpers/decode-token.js';
+import { WRONG_EMAIL_MSG, WRONG_PASS_MSG } from '../../../constants.js';
 
 export default class UserService {
   constructor(userRepository, patientRepository) {
@@ -88,7 +89,29 @@ export default class UserService {
     const token = jwt.sign({
       email: data.email,
       userId: data.id,
-    }, process.env.JWT_KEY, { expiresIn: 3600 });
+      role: 'patient',
+    }, process.env.JWT_KEY);
+
+    return token;
+  }
+
+  async doctorLogin(email, currPassword) {
+    const { password, id } = await this.userRepository.checkEmail(email);
+    if (!password) throw new Error(WRONG_EMAIL_MSG);
+
+    const isPasswordMatches = await bcrypt.compare(currPassword, password);
+    if (!isPasswordMatches) throw new Error(WRONG_PASS_MSG);
+
+    const token = await this.createDoctorToken(id);
+
+    return token;
+  }
+
+  async createDoctorToken(id) {
+    const token = jwt.sign({
+      userId: id,
+      role: 'doctor'
+    }, process.env.JWT_KEY);
 
     return token;
   }

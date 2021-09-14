@@ -4,9 +4,9 @@ export default class QueueService {
     this.queueRepository = queueRepository;
   }
 
-  async get() {
+  async get(docId) {
     try {
-      const result = await this.queueRepository.get();
+      const result = await this.queueRepository.get(docId);
       if (!result) {
         return false;
       }
@@ -18,9 +18,9 @@ export default class QueueService {
     }
   }
 
-  async add(patientId) {
+  async add(patientId, docId) {
     try {
-      const result = await this.queueRepository.add(patientId);
+      const result = await this.queueRepository.add(patientId, docId);
       if (result) {
         return result;
       }

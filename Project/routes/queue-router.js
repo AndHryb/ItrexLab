@@ -15,6 +15,7 @@ queueRouter.get('/', async (req, res) => {
   const cookies = cookie.parse(req.headers.cookie);
   const { token } = cookies;
   const checkToken = await userController.getByToken(`Bearer ${token}`);
+  
   if (checkToken.value.patient) {
     res.sendFile(path.resolve(__dirname, 'static', 'patient.html'));
   } else {
@@ -34,16 +35,26 @@ queueRouter.get('/connect', (req, res) => {
 });
 
 queueRouter.get('/next-in-queue', async (req, res) => {
-  const result = await queueController.getNext();
+  const cookies = cookie.parse(req.headers.cookie);
+  const doctorToken = cookies.doctorToken;
+  
+  const result = await queueController.getNext(doctorToken);
+  
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
   emitter.emit('next', result.value);
 });
 
 queueRouter.post('/in-queue', async (req, res) => {
+  const cookies = cookie.parse(req.headers.cookie);
+  const { token } = cookies;
+  const result = await queueController.addToQueue(token, req.body.docID);
+  res.status(result.status).json(result.value);
+  /*
   const result = await queueController.addToQueue(req.headers.authorization);
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
+  */
 });
 
 export default queueRouter;

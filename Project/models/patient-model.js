@@ -22,9 +22,10 @@ export default function patientModel(sequelize) {
     },
   });
 
-  model.sync({ force: true })
+  /*
+  model.sync()
     .then(() => console.log('patientSQLDB table has been successfully created, if one doesn\'t exist'))
-    .catch((error) => console.log('This error occurred', error));
+    .catch((error) => console.log('This error occurred', error));*/
 
   return model;
 }

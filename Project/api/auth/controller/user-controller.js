@@ -70,4 +70,22 @@ export default class UserController {
 
     return res;
   }
+
+  async doctorLogin(data) {
+    const res = new Request();
+    try {
+      const {email, password} = data;
+      const result = await this.userService.doctorLogin(email, password);
+
+      res.status = STATUSES.OK;
+      res.value = result;
+
+      return res;
+    } catch (err) {
+      res.status = STATUSES.Unauthorized;
+      res.value = err.message;
+      
+      return res;
+    }
+  }
 }

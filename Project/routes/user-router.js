@@ -20,6 +20,19 @@ userRouter.get('/login', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static', 'login.html'));
 });
 
+userRouter.get('/doctor-login', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'static', 'doctor-login.html'));
+});
+
+userRouter.post('/login/doctor', async (req, res) => {
+  const result = await userController.doctorLogin(req.body);
+  if (result.status === 200) res.cookie('doctorToken',`${result.value}`, {
+    httpOnly: true,
+  });
+
+  res.status(result.status).json(result.value);
+})
+
 userRouter.get('/username', async (req, res) => {
   const result = await userController.getByToken(req.headers.authorization);
   res.status(result.status).json(result.value);

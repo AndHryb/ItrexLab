@@ -18,10 +18,10 @@ export default function userModel(sequelize) {
       type: DataTypes.STRING,
     },
   });
-
-  model.sync({ force: true })
+/*
+  model.sync({ alter: true })
     .then(() => console.log('usersSQLDB table has been successfully created, if one doesn\'t exist'))
-    .catch((error) => console.log('This error occurred', error));
+    .catch((error) => console.log('This error occurred', error));*/
 
   return model;
 }
