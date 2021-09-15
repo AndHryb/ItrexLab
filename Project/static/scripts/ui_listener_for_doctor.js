@@ -97,7 +97,7 @@ showResolutionBtn.addEventListener('click', async () => {
     const tr = document.createElement('tr');
 
     const th1 = document.createElement('th');
-    th1.innerHTML = 'Patient ID';
+    th1.innerHTML = 'Resolution ID';
     tr.appendChild(th1);
 
     const th2 = document.createElement('th');

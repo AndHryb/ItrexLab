@@ -16,6 +16,15 @@ export async function creator(docModel, userModel, specModel) {
         { id: uuidv4(), name: 'pediatrician' },
     ];
 
+    const docSpec = [
+        { docName: 'Dima', specName: 'surgery' },
+        { docName: 'Dima', specName: 'pediatrician' },
+        { docName: 'Kat', specName: 'pediatrician' },
+        { docName: 'Joe', specName: 'gynecology' },
+        { docName: 'Clarc', specName: 'surgery' },
+        { docName: 'Kat', specName: 'gynecology' },
+    ];
+
     async function createPair(name, email, userId) {
         await userModel.create({
             id: userId,
@@ -30,29 +39,6 @@ export async function creator(docModel, userModel, specModel) {
             userId: userId,
         });
     }
-
-    users.forEach(async (elem) => {
-        await createPair(elem.name, elem.email, elem.id);
-    });
-
-    specialities.forEach(async (elem) => {
-        await specModel.create({
-            name: elem.name,
-            id: elem.id,
-        });
-    });
-}
-
-export async function addDocSpecConnection(specModel, docModel) {
-
-    const docSpec = [
-        { docName: 'Dima', specName: 'surgery' },
-        { docName: 'Dima', specName: 'pediatrician' },
-        { docName: 'Kat', specName: 'pediatrician' },
-        { docName: 'Joe', specName: 'gynecology' },
-        { docName: 'Clarc', specName: 'surgery' },
-        { docName: 'Kat', specName: 'gynecology' },
-    ];
 
     async function create(docName, specName) {
         const spec = await specModel.findOne({
@@ -73,6 +59,17 @@ export async function addDocSpecConnection(specModel, docModel) {
             create(elem.docName, elem.specName);
         })
     }
+
+    users.forEach(async (elem) => {
+        await createPair(elem.name, elem.email, elem.id);
+    });
+
+    specialities.forEach(async (elem) => {
+        await specModel.create({
+            name: elem.name,
+            id: elem.id,
+        });
+    });
 
     setTimeout(seed, 1000);
 }

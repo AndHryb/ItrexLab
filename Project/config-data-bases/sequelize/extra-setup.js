@@ -1,21 +1,10 @@
 import pkg from 'sequelize';
-import { creator, addDocSpecConnection } from '../../helpers/dbSeed.js';
+import { creator } from '../../helpers/dbSeed.js';
 
 const { DataTypes } = pkg;
 
 export default function applyExtraSetup(sequelize) {
   const { resolutionsSQLDB, patientsSQLDB, usersSQLDB, doctorsSQLDB, specialtiesSQLDB } = sequelize.models;
-
-  //patientsSQLDB.hasMany(resolutionsSQLDB);
-
-  /*
-  resolutionsSQLDB.belongsTo(patientsSQLDB, {
-    foreignKey: {
-      name: 'patientId',
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-  });*/
 
   patientsSQLDB.hasMany(resolutionsSQLDB, {
     foreignKey: {
@@ -39,8 +28,6 @@ export default function applyExtraSetup(sequelize) {
   resolutionsSQLDB.belongsTo(patientsSQLDB, {
     as: 'patient'
   });
-
-  //resolutionsSQLDB.belongsTo(patientsSQLDB);
 
   patientsSQLDB.belongsTo(usersSQLDB, {
     foreignKey: {
@@ -68,9 +55,8 @@ export default function applyExtraSetup(sequelize) {
     as: 'doctors',
   });
 
-  sequelize.sync()
+  sequelize.sync({ force: true })
     .then(() => console.log('sync'))
-    //.then(() => creator(doctorsSQLDB, usersSQLDB, specialtiesSQLDB))
-    //.then(() => addDocSpecConnection(specialtiesSQLDB, doctorsSQLDB))
+    .then(() => creator(doctorsSQLDB, usersSQLDB, specialtiesSQLDB))
     .catch((error) => console.log('This error occurred', error));
 }

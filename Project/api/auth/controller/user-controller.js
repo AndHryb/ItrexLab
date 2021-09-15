@@ -20,9 +20,9 @@ export default class UserController {
       return res;
     }
     res.value = {
-      message: 'This email is already busy, try another one...',
+      message: 'Email addres is exist',
     };
-    res.status = STATUSES.ServerError;
+    res.status = STATUSES.Conflict;
 
     return res;
   }

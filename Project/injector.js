@@ -20,7 +20,6 @@ class Injector {
   constructor() {
     const sequelize = sequelizeInit();
     const { resolutionsSQLDB, patientsSQLDB, usersSQLDB, doctorsSQLDB, specialtiesSQLDB } = sequelize.models;
-    console.log(sequelize.models);
     this.resolutionRepository = new ResolutionSqlRepository(resolutionsSQLDB,patientsSQLDB, doctorsSQLDB);
     this.patientRepository = new PatientSqlRepository(patientsSQLDB,resolutionsSQLDB);
     this.userRepository = new UserSqlRepository(usersSQLDB);
