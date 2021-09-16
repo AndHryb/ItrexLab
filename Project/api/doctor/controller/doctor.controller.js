@@ -15,7 +15,7 @@ export default class DoctorController {
             return result;
         } catch(err) {
             console.log(err);
-            result.status = STATUSES.ServerError;
+            result.status = STATUSES.NoContent;
             result.value = err;
             return result;
         }

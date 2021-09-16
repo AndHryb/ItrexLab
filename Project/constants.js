@@ -8,6 +8,8 @@ export const WRONG_PASS_MSG = 'wrong password';
 
 export const WRONG_EMAIL_MSG = 'wrong email';
 
+export const NO_DOC_MSG = 'no such doctor';
+
 export const STATUSES = {
   OK: 200,
   Created: 201,

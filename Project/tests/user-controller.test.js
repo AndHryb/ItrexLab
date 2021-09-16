@@ -52,9 +52,7 @@ describe('user controller unit test', () => {
     userService.registration.mockResolvedValue(false);
     const res = await userController.registration(registrationData);
     expect(res.status)
-      .toEqual(STATUSES.ServerError);
-    expect(res.value.message)
-      .toEqual('This email is already busy, try another one...');
+      .toEqual(STATUSES.Conflict);
   });
 
   test('login(all ok)', async () => {
