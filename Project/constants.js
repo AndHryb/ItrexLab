@@ -10,6 +10,10 @@ export const WRONG_EMAIL_MSG = 'wrong email';
 
 export const NO_DOC_MSG = 'no such doctor';
 
+export const NO_PATIENT_MSG = 'no such patient';
+
+export const NO_RIGHT_TO_DELETE_MSG = 'no right to delete';
+
 export const STATUSES = {
   OK: 200,
   Created: 201,

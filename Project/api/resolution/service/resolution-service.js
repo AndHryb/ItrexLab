@@ -1,4 +1,5 @@
 import decodeToken from '../../../helpers/decode-token.js';
+import { NO_RIGHT_TO_DELETE_MSG } from '../../../constants.js';
 
 export default class ResolutionService {
   constructor(queueRepository, resolutionRepository, patientRepository, TTL) {
@@ -75,7 +76,7 @@ export default class ResolutionService {
   async delete(resolutionId, docId) {
     try {
       const isTheRightDoc = await this.isTheRightDoctor(resolutionId, docId);
-      if (!isTheRightDoc) throw new Error('no right to delete');
+      if (!isTheRightDoc) throw new Error(NO_RIGHT_TO_DELETE_MSG);
       const result = await this.resolutionRepository.delete(resolutionId);
 
       return result;

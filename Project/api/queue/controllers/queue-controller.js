@@ -1,4 +1,4 @@
-import { STATUSES } from '../../../constants.js';
+import { STATUSES, NO_PATIENT_MSG } from '../../../constants.js';
 import Request from '../../../helpers/request.js';
 import checkJwtToken from '../../../helpers/decode-doctor-token.js';
 import { doctorController } from '../../../routes/resolution-router.js';
@@ -14,14 +14,14 @@ export default class QueueController {
     try {
       const { userId } = checkJwtToken(token);
       const patient = await this.userService.getByUserId(userId);
-      if (!patient) throw (new Error('db error'));
+      if (!patient) throw (new Error(NO_PATIENT_MSG));
       const result = await this.queueService.add(patient.id, docId);
       res.status = STATUSES.Created;
       res.value = result;
 
       return res;
     } catch (err) {
-      res.status = STATUSES.ServerError;
+      res.status = STATUSES.NotFound;
       res.value = err;
 
       return res;
@@ -29,9 +29,9 @@ export default class QueueController {
 
   }
 
-  async getNext(token) {
+  async getNext(docToken) {
     const res = new Request();
-    const { userId } = checkJwtToken(token);
+    const { userId } = checkJwtToken(docToken);
     const { id } = await doctorController.getByUserId(userId);
     const result = await this.queueService.get(id);
     

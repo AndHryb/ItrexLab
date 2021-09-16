@@ -1,8 +1,7 @@
-import { STATUSES } from '../../../constants.js';
+import { STATUSES, NO_RIGHT_TO_DELETE_MSG } from '../../../constants.js';
 import Request from '../../../helpers/request.js';
 import checkJwtToken from '../../../helpers/decode-doctor-token.js';
 import { doctorController } from '../../../routes/resolution-router.js';
-import e from 'express';
 
 export default class ResolutionController {
   constructor(resolutionService) {
@@ -82,10 +81,10 @@ export default class ResolutionController {
         res.value = {
           message: `The resolution ${reqBody} not found in the database`,
         };
-      } else if (result.message === 'no right to delete') {
+      } else if (result.message === NO_RIGHT_TO_DELETE_MSG) {
         res.status = STATUSES.Forbidden;
         res.value = {
-          message: 'You cant delete this resolution',
+          message: NO_RIGHT_TO_DELETE_MSG,
         }
       }
 
