@@ -6,10 +6,9 @@ const displayPatientName = document.getElementById('display_patient_name');
 const accountName = document.getElementById('account_name');
 const addBtnForPatientName = document.getElementById('add_patient_name');
 const resolutionTable = document.getElementById('resolution_for_patient');
-const dropDownSpec = document.getElementById("speciality-list");
+const dropDownSpec = document.getElementById('speciality-list');
 
 addBtnForPatientName.addEventListener('click', async () => {
-
   const dropDownDoc = document.getElementById('doctors-list');
   try {
     let response = await fetch('/patient/in-queue', {
@@ -17,7 +16,7 @@ addBtnForPatientName.addEventListener('click', async () => {
       headers: {
         'Content-Type': 'application/json;charset=utf-8',
       },
-      body: JSON.stringify({ docID: dropDownDoc.value })
+      body: JSON.stringify({ docID: dropDownDoc.value, spec: dropDownSpec.value }),
     });
 
     response = await response.json();
@@ -33,25 +32,65 @@ addBtnForPatientName.addEventListener('click', async () => {
     console.log(data);
   } catch (err) {
     console.log('Request failed', err);
-  }*/
+  } */
 });
 
-
-const subscribe = async () => {
-  const eventSource = new EventSource('/patient/connect');
-  eventSource.onmessage = function (event) {
-    const result = JSON.parse(event.data);
-    displayPatientName.textContent = result;
-  };
-};
-
-subscribe();
+// const subscribe = async () => {
+//   const eventSource = new EventSource('/patient/connect');
+//   eventSource.onmessage = function (event) {
+//     const result = JSON.parse(event.data);
+//     displayPatientName.textContent = result;
+//   };
+// };
+//
+// subscribe();
 
 window.addEventListener('load', async () => {
   try {
-    const response = await authClient.client.get('/patient/next-in-queue');
+    const response = await authClient.client.get('/patient/all-queues');
     const data = await response.data;
-    displayPatientName.textContent = data;
+    console.log(data);
+
+    const queueTable = document.createElement('table');
+    queueTable.setAttribute('class', 'queue_table');
+
+    const head = document.createElement('tr');
+
+    const docName = document.createElement('th');
+    docName.innerHTML = 'doctor\'s name';
+    head.appendChild(docName);
+
+    const length = document.createElement('th');
+    length.innerHTML = 'length';
+    head.appendChild(length);
+
+    const next = document.createElement('th');
+    next.innerHTML = 'next';
+    head.appendChild(next);
+
+    queueTable.appendChild(head);
+
+
+    data.forEach((elem) => {
+      const tr = document.createElement('tr');
+
+      const docNameVal = document.createElement('th');
+      docNameVal.innerHTML = elem.doctor;
+      tr.appendChild(docNameVal);
+
+      const lengthVal = document.createElement('th');
+      lengthVal.innerHTML = elem.length;
+      tr.appendChild(lengthVal);
+
+      const nextVal = document.createElement('th');
+      nextVal.innerHTML = elem.next;
+      tr.appendChild(nextVal);
+
+      queueTable.appendChild(tr);
+    });
+    displayPatientName.appendChild(queueTable);
+
+    // displayPatientName.textContent = data;
   } catch (err) {
     console.log('Request failed', err);
   }
@@ -67,12 +106,12 @@ window.addEventListener('load', async () => {
   try {
     const response = await authClient.client.get('/doctor/resolution/me');
     const data = await response.data;
- 
+
     if (data.resolution.length > 0) {
       data.resolution.forEach((elem) => {
         const arr = elem.createdAt.split('T');
-        const time = arr[1].substr(0,8);
-        
+        const time = arr[1].substr(0, 8);
+
         const tr = document.createElement('tr');
         const contentTd = document.createElement('td');
         contentTd.innerHTML = elem.resolution;
@@ -96,25 +135,24 @@ window.addEventListener('load', async () => {
   } catch (err) {
     console.log('Request failed', err);
   }
-
+});
+window.addEventListener('load', async () => {
   try {
-    const response = await fetch('/doctor/all');
-    const doctors = await response.json();
+    const response = await authClient.client.get('/doctor/all');
+    const doctors = await response.data;
 
     const spec = new Set();
     doctors.forEach((elem) => {
       const { specialties } = elem;
-      specialties.forEach((elem1) => spec.add(elem1.name))
+      specialties.forEach((elem1) => spec.add(elem1.name));
     });
 
-    for (let elem of spec) {
-      let opt = document.createElement('option');
-      opt.setAttribute('value', `${elem}`)
+    for (const elem of spec) {
+      const opt = document.createElement('option');
+      opt.setAttribute('value', `${elem}`);
       opt.innerHTML = elem;
       dropDownSpec.appendChild(opt);
     }
-
-    dropDownSpec.addEventListener('change', createDoctors);
 
     function createDoctors(event) {
       const dropDownDoc = document.getElementById('doctors-list');
@@ -124,19 +162,20 @@ window.addEventListener('load', async () => {
         return specialties.find((elem) => elem.name === spec);
       });
 
-
       dropDownDoc.remove();
-      let select = document.createElement('select');
+      const select = document.createElement('select');
       select.setAttribute('id', 'doctors-list');
       addBtnForPatientName.before(select);
 
       docList.forEach((elem) => {
-        let opt = document.createElement('option');
-        opt.setAttribute('value', `${elem.id}`)
+        const opt = document.createElement('option');
+        opt.setAttribute('value', `${elem.id}`);
         opt.innerHTML = elem.name;
         select.appendChild(opt);
-      })
+      });
     }
+
+    dropDownSpec.addEventListener('change', createDoctors);
   } catch (err) {
     console.log(err);
   }

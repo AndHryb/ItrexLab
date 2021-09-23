@@ -5,33 +5,12 @@ dotenv.config();
 const env = process.env.NODE_ENV;
 console.log(`process.env = ${process.env.NODE_ENV}`);
 
-const memory = {
-  app: {
-    port: process.env.PORT || 3000,
-  },
-  storage: {
-    name: 'memory',
-    host: process.env.REPOSITORY_HOST,
-    port: 6379,
-  },
-};
-
-const redis = {
-  app: {
-    port: process.env.PORT || 3000,
-  },
-  storage: {
-    name: 'redis',
-    host: process.env.REPOSITORY_HOST,
-    port: 6379,
-  },
-};
 const test = {
   app: {
     port: process.env.PORT || 3000,
   },
   storage: {
-    name: process.env.TEST_STORAGE,
+    name: process.env.TEST_REPOSITORY,
     host: process.env.REPOSITORY_HOST,
     port: 6379,
   },
@@ -50,8 +29,6 @@ const sql = {
   },
 };
 const config = {
-  memory,
-  redis,
   test,
   sql,
 };

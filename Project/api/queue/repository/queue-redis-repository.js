@@ -40,4 +40,20 @@ export default class QueueRedisRepository {
 
     return result;
   }
+
+  async getAll() {
+    const data = promisify(this.client.scan).bind(this.client);
+    const result = await data(0);
+    const queueData = {};
+    for (const elem of result[1]) {
+      const elemLength = promisify(this.client.llen).bind(this.client);
+      const resultLength = await elemLength(elem);
+
+      const firstInQueue = promisify(this.client.lindex).bind(this.client);
+      const resulPatient = await firstInQueue(elem, 0);
+      queueData[elem] = { length: resultLength, next: resulPatient };
+    }
+
+    return queueData;
+  }
 }

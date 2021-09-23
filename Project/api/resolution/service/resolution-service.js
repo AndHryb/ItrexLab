@@ -10,17 +10,15 @@ export default class ResolutionService {
   }
 
   async getResolutionsByName(name) {
-    let res = false;
+    const res = false;
     try {
       const resolutionList = await this.resolutionRepository.getByName(name);
       if (!resolutionList) {
         return res;
       }
 
-      let resolutionListTTL = resolutionList.filter((elem) => {
-        return this.TTL > (new Date()).getTime() - (new Date(elem.createdAt)).getTime();
-      });
-
+      const resolutionListTTL = resolutionList.filter((elem) => this.TTL > (new Date()).getTime() - (new Date(elem.createdAt)).getTime());
+      //проверить работает ли ттл без bind this
       return resolutionListTTL;
     } catch (err) {
       console.log(`Resolution service add error :${err.name} : ${err.message}`);
@@ -47,9 +45,11 @@ export default class ResolutionService {
       const patientId = await this.queueRepository.delete(docId);
 
       if (!patientId) {
-        return false
+        return false;
       }
-      await this.resolutionRepository.add({ patientId, resolution, docId, spec });
+      await this.resolutionRepository.add({
+        patientId, resolution, docId, spec,
+      });
 
       return patientId;
     } catch (err) {

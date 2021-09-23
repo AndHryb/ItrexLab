@@ -4,7 +4,9 @@ import { creator } from '../../helpers/dbSeed.js';
 const { DataTypes } = pkg;
 
 export default function applyExtraSetup(sequelize) {
-  const { resolutionsSQLDB, patientsSQLDB, usersSQLDB, doctorsSQLDB, specialtiesSQLDB } = sequelize.models;
+  const {
+    resolutionsSQLDB, patientsSQLDB, usersSQLDB, doctorsSQLDB, specialtiesSQLDB,
+  } = sequelize.models;
 
   patientsSQLDB.hasMany(resolutionsSQLDB, {
     foreignKey: {
@@ -19,14 +21,14 @@ export default function applyExtraSetup(sequelize) {
       name: 'doctorId',
       type: DataTypes.UUID,
       allowNull: false,
-    }
+    },
   });
 
   resolutionsSQLDB.belongsTo(doctorsSQLDB, {
-    as: 'doctor'
+    as: 'doctor',
   });
   resolutionsSQLDB.belongsTo(patientsSQLDB, {
-    as: 'patient'
+    as: 'patient',
   });
 
   patientsSQLDB.belongsTo(usersSQLDB, {

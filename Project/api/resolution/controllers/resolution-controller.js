@@ -1,11 +1,11 @@
 import { STATUSES, NO_RIGHT_TO_DELETE_MSG } from '../../../constants.js';
 import Request from '../../../helpers/request.js';
 import checkJwtToken from '../../../helpers/decode-doctor-token.js';
-import { doctorController } from '../../../routes/resolution-router.js';
 
 export default class ResolutionController {
-  constructor(resolutionService) {
+  constructor(resolutionService, doctorService) {
     this.resolutionService = resolutionService;
+    this.doctorService = doctorService;
   }
 
   async getResolutionsByName(reqBody) {
@@ -24,7 +24,6 @@ export default class ResolutionController {
       message: `${dataList.length} patient(s) were found`,
       resolutions: dataList,
     };
-
 
     return res;
   }
@@ -50,7 +49,7 @@ export default class ResolutionController {
   async addResolution(reqBody, docToken) {
     const res = new Request();
     const { userId } = checkJwtToken(docToken);
-    const doc = await doctorController.getByUserId(userId);
+    const doc = await this.doctorService.getByUserId(userId);
 
     const result = await this.resolutionService.addResolution(reqBody.value, doc.id, reqBody.spec);
 
@@ -72,7 +71,7 @@ export default class ResolutionController {
     const res = new Request();
 
     const { userId } = checkJwtToken(doctorToken);
-    const { id } = await doctorController.getByUserId(userId);
+    const { id } = await this.doctorService.getByUserId(userId);
     const result = await this.resolutionService.delete(reqBody, id);
 
     if (result instanceof Error) {
@@ -85,7 +84,7 @@ export default class ResolutionController {
         res.status = STATUSES.Forbidden;
         res.value = {
           message: NO_RIGHT_TO_DELETE_MSG,
-        }
+        };
       }
 
       return res;

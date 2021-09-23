@@ -16,7 +16,7 @@ userRouter.get('/registration', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static', 'registration.html'));
 });
 
-userRouter.get('/login', (req, res) => {
+userRouter.get('/patient-login', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static', 'login.html'));
 });
 
@@ -30,15 +30,17 @@ userRouter.post('/login/doctor', async (req, res, next) => {
   } else { res.status(STATUSES.BadRequest).json('Fill out the form with the correct data'); }
 }, async (req, res) => {
   const result = await userController.doctorLogin(req.body);
-  if (result.status === 200) res.cookie('doctorToken', `${result.value}`, {
-    httpOnly: true,
-  });
+  if (result.status === 200) {
+    res.cookie('doctorToken', `${result.value}`, {
+      httpOnly: true,
+    });
+  }
 
   res.status(result.status).json(result.value);
-})
+});
 
 userRouter.get('/username', async (req, res) => {
-  const result = await userController.getByToken(req.headers.authorization);
+  const result = await userController.getPatientByToken(req.headers.authorization);
   res.status(result.status).json(result.value);
 });
 

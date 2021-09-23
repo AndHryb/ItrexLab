@@ -9,44 +9,47 @@ import { checkNameSchema } from '../helpers/validation-schems-ajv/checkName.js';
 import checkJwtToken from '../helpers/decode-doctor-token.js';
 
 const __dirname = path.resolve();
-const resolutionRouter = express.Router();
+const doctorRouter = express.Router();
 const ajv = new Ajv();
 const resolutionController = injector.getResolutionController();
-export const doctorController = injector.getDoctorController();
+const doctorController = injector.getDoctorController();
+const userController = injector.getUserController();
 
-resolutionRouter.get('/', async (req, res, next) => {
+doctorRouter.get('/', async (req, res, next) => {
   const cookies = cookie.parse(req.headers.cookie);
-  if (cookies.doctorToken) {
-    const result = checkJwtToken(cookies.doctorToken);
+  const result = await userController.getDoctorByToken(cookies.doctorToken);
+  if (result.value.doctor) {
     next();
   } else {
     res.redirect('/auth/doctor-login');
   }
-})
-
-resolutionRouter.get('/', (req, res) => {
+}, (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static', 'doctor.html'));
 });
 
-resolutionRouter.post('/resolution', async (req, res, next) => {
+// resolutionRouter.get('/', (req, res) => {
+//   res.sendFile(path.resolve(__dirname, 'static', 'doctor.html'));
+// });
+
+doctorRouter.post('/resolution', async (req, res, next) => {
   if (ajv.validate(checkResolutionSchema, req.body.value)) {
     next();
   } else { res.status(STATUSES.BadRequest).json('The field must not be empty'); }
 }, async (req, res) => {
   const cookies = cookie.parse(req.headers.cookie);
-  const { doctorToken } = cookies
+  const { doctorToken } = cookies;
   const result = await resolutionController.addResolution(req.body, doctorToken);
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
 });
 
-resolutionRouter.get('/resolution/me', async (req, res) => {
+doctorRouter.get('/resolution/me', async (req, res) => {
   const result = await resolutionController.getResolutionByToken(req.headers.authorization);
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
 });
 
-resolutionRouter.get('/resolution-patient', async (req, res, next) => {
+doctorRouter.get('/resolution-patient', async (req, res, next) => {
   if (ajv.validate(checkNameSchema, req.query.name)) {
     next();
   } else { res.status(STATUSES.BadRequest).json('Incorrect patient name'); }
@@ -56,7 +59,7 @@ resolutionRouter.get('/resolution-patient', async (req, res, next) => {
   res.status(result.status).json(result.value);
 });
 
-resolutionRouter.delete('/resolution', async (req, res, next) => {
+doctorRouter.delete('/resolution', async (req, res, next) => {
   if (req.body.value) {
     next();
   } else { res.status(STATUSES.BadRequest).json('Incorrect patient name'); }
@@ -68,18 +71,18 @@ resolutionRouter.delete('/resolution', async (req, res, next) => {
   res.status(result.status).json(result.value);
 });
 
-resolutionRouter.get('/all', async (req, res) => {
+doctorRouter.get('/all', async (req, res) => {
   const result = await doctorController.getDoctors();
   res.status(result.status).json(result.value);
 });
 
-resolutionRouter.get('/specialities', async(req, res) => {
+doctorRouter.get('/specialities', async (req, res) => {
   const cookies = cookie.parse(req.headers.cookie);
   const { doctorToken } = cookies;
   const { userId } = checkJwtToken(doctorToken);
   const doctor = await doctorController.getByUserId(userId);
   const result = await doctorController.getSpec(doctor.id);
   res.status(result.status).json(result.value);
-})
+});
 
-export default resolutionRouter;
+export default doctorRouter;

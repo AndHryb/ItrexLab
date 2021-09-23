@@ -2,6 +2,7 @@ class AuthApi {
   constructor() {
     this.client = axios.create();
     this.token = undefined;
+    this.rr = 'lolol';
 
     this.client.interceptors.request.use((config) => {
       if (!this.token) {
@@ -19,9 +20,9 @@ class AuthApi {
 
   async login(formData) {
     try {
-      const { data } = await this.client.post('/auth/login', formData);
+      const { data } = await this.client.post('/auth/patient-login', formData);
       if (data.token) {
-        this.token = `${data.token}`;
+        this.token = `${(data.token).toString()}`;
         return data.message;
       }
       return false;

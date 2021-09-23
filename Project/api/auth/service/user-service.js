@@ -1,12 +1,14 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import decodeToken from '../../../helpers/decode-token.js';
+import checkJwtToken from '../../../helpers/decode-doctor-token.js';
 import { WRONG_EMAIL_MSG, WRONG_PASS_MSG } from '../../../constants.js';
 
 export default class UserService {
-  constructor(userRepository, patientRepository) {
+  constructor(userRepository, patientRepository,doctorRepository) {
     this.userRepository = userRepository;
     this.patientRepository = patientRepository;
+    this.doctorRepository = doctorRepository;
   }
 
   async registration(data) {
@@ -76,6 +78,20 @@ export default class UserService {
     }
   }
 
+  async getDoctorByToken(token) {
+    try {
+      if (!token) {
+        return false;
+      }
+      const decoded = checkJwtToken(token);
+      const { userId } = decoded;
+      const result = await this.doctorRepository.getByUserId(userId);
+      return result;
+    } catch (err) {
+      console.log(`User service getDoctorByToken error :${err.name} : ${err.message}`);
+    }
+  }
+
   async getByUserId(userId) {
     try {
       const result = await this.patientRepository.getByUserId(userId);
@@ -110,7 +126,7 @@ export default class UserService {
   async createDoctorToken(id) {
     const token = jwt.sign({
       userId: id,
-      role: 'doctor'
+      role: 'doctor',
     }, process.env.JWT_KEY);
 
     return token;

@@ -66,9 +66,14 @@ header{
 }
 #patient_input_validation{
     color: red;
-} 
+}
 
 .resolution_table {
+    border-collapse: collapse;
+    width: 80%;
+}
+
+.queue_table {
     border-collapse: collapse;
     width: 80%;
 }
@@ -78,10 +83,24 @@ header{
     padding: 4px;
 }
 
+.queue_table  tr td {
+    border: 1px solid black;
+    padding: 4px;
+}
+
 .resolution_table th {
     border: 1px solid black;
     padding: 4px;
     text-align: center;
+}
+
+.queue_table th {
+    border: 1px solid black;
+    padding: 4px;
+    text-align: center;
+}
+#display_patient_name{
+    font-size: 1em;
 }
 
 

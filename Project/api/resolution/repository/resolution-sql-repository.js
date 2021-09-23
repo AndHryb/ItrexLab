@@ -5,7 +5,9 @@ export default class ResolutionSqlRepository {
     this.doctorModel = doctor;
   }
 
-  async add({ patientId, resolution, docId, spec }) {
+  async add({
+    patientId, resolution, docId, spec,
+  }) {
     const createdResolution = await this.resolutionsModel.create({
       patientId,
       resolution,
@@ -31,9 +33,10 @@ export default class ResolutionSqlRepository {
         patientId,
       },
       include: [{
-        model: this.doctorModel, as: 'doctor',
+        model: this.doctorModel,
+        as: 'doctor',
         attributes: ['name', 'id'],
-      }]
+      }],
     });
     if (!reqResolution) {
       return false;
@@ -54,16 +57,18 @@ export default class ResolutionSqlRepository {
     const patientlist = await this.resolutionsModel.findAll({
       attributes: ['id', 'resolution', 'speciality', 'createdAt'],
       include: [{
-        model: this.patientsModel, as: 'patient',
+        model: this.patientsModel,
+        as: 'patient',
         where: {
-          name
+          name,
         },
-        attributes: ['name', 'gender', 'birthday']
+        attributes: ['name', 'gender', 'birthday'],
       },
       {
-        model: this.doctorModel, as: 'doctor',
-        attributes: ['name']
-      }]
+        model: this.doctorModel,
+        as: 'doctor',
+        attributes: ['name'],
+      }],
     });
 
     return patientlist;

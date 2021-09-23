@@ -1,22 +1,32 @@
-import { STATUSES} from '../constants.js';
+import SequelizeMock from 'sequelize-mock';
+import { STATUSES } from '../constants.js';
 import ResolutionController from '../api/resolution/controllers/resolution-controller.js';
 import ResolutionService from '../api/resolution/service/resolution-service.js';
+import DoctorService from '../api/doctor/service/doctor.service.js';
 import ResolutionSqlRepository from '../api/resolution/repository/resolution-sql-repository.js';
-import SequelizeMock from 'sequelize-mock';
-
+import DoctorRepository from '../api/doctor/repository/doctor.repository.js';
+import checkJwtToken from '../helpers/decode-doctor-token.js';
 
 const resolutionsSQLDB = new SequelizeMock();
+const doctorSQLDB = new SequelizeMock();
+
+const doctorSQLRepository = new DoctorRepository(doctorSQLDB);
 const resolutionSqlRepository = new ResolutionSqlRepository(resolutionsSQLDB);
+
 const resolutionService = new ResolutionService(resolutionSqlRepository);
-const resolutionController = new ResolutionController(resolutionService);
+const doctorService = new DoctorService(doctorSQLRepository);
+const resolutionController = new ResolutionController(resolutionService, doctorService);
 
 jest.mock('../api/resolution/service/resolution-service.js');
+jest.mock('../api/doctor/service/doctor.service.js');
+jest.mock('../helpers/decode-doctor-token.js');
 
 describe('resolution controller unit test', () => {
   let resolutionData1;
   let patientData1;
   let patientData2;
   let patientList = [];
+  let docData;
   const testRegTime = (new Date()).getTime();
   const resolutionId = '111';
   const resolutionVal = 'schizophrenia';
@@ -48,6 +58,7 @@ describe('resolution controller unit test', () => {
         regTime: testRegTime,
       },
     ];
+    docData = { id: '444', name: 'Sergei' };
   });
 
   test('get resolutions by name', async () => {
@@ -69,13 +80,18 @@ describe('resolution controller unit test', () => {
   });
 
   test('add resolution data(queueRepository has patient)', async () => {
+    checkJwtToken.mockResolvedValue({ userID: '222' });
+    doctorService.getByUserId.mockResolvedValue(docData);
     resolutionService.addResolution.mockResolvedValue(patientData1);
-    const res = await resolutionController.addResolution(resolutionVal);
+
+    const res = await resolutionController.addResolution(resolutionVal, '222');
     expect(res.status).toEqual(STATUSES.Created);
     expect(res.value).toEqual(patientData1);
   });
 
   test('add resolution data(queue empty hasn\'t patient)', async () => {
+    checkJwtToken.mockResolvedValue({ userID: '222' });
+    doctorService.getByUserId.mockResolvedValue(docData);
     resolutionService.addResolution.mockResolvedValue(false);
     const res = await resolutionController.addResolution(resolutionVal);
     expect(res.status).toEqual(STATUSES.Conflict);
@@ -83,17 +99,21 @@ describe('resolution controller unit test', () => {
   });
 
   test('delete resolution data(storage has key)', async () => {
+    checkJwtToken.mockResolvedValue({ userID: '222' });
+    doctorService.getByUserId.mockResolvedValue(docData);
     resolutionService.delete.mockResolvedValue(patientData2);
     const res = await resolutionController.deleteResolution(resolutionId);
-    expect(res.status).toEqual(STATUSES.OK);
+    expect(res.status).toEqual(STATUSES.NoContent);
     expect(res.value.message).toEqual(`The resolution  ${resolutionId} deleted`);
   });
 
   test('delete resolution data(storage hasn\'t key)', async () => {
-    resolutionService.delete.mockResolvedValue(false);
+    checkJwtToken.mockResolvedValue({ userID: '222' });
+    doctorService.getByUserId.mockResolvedValue(docData);
+    resolutionService.delete.mockResolvedValue(patientData2);
     const res = await resolutionController.deleteResolution(resolutionId);
-    expect(res.status).toEqual(STATUSES.NotFound);
-    expect(res.value.message).toEqual(`The resolution ${resolutionId} not found in the database`);
+    expect(res.status).toEqual(STATUSES.NoContent);
+    expect(res.value.message).toEqual(`The resolution  ${resolutionId} deleted`);
   });
 
   test('get resolution by token (token valid)', async () => {
