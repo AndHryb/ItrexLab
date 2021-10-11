@@ -1,9 +1,9 @@
 import SequelizeMock from 'sequelize-mock';
-import { STATUSES } from '../constants.js';
-import UserController from '../api/auth/controller/user-controller.js';
-import UserService from '../api/auth/service/user-service.js';
-import UserSqlRepository from '../api/auth/repository/user-sql-repository.js';
-import PatientSqlRepository from '../api/patient/repository/patient-sql-repository.js';
+import { STATUSES } from '../../../constants.js';
+import UserController from '../controller/user-controller.js';
+import UserService from '../service/user-service.js';
+import UserSqlRepository from '../repository/user-sql-repository.js';
+import PatientSqlRepository from '../../patient/repository/patient-sql-repository.js';
 
 const { usersSQLDB, patientsSQLDB } = new SequelizeMock();
 
@@ -12,7 +12,7 @@ const patientSqlRepository = new PatientSqlRepository(patientsSQLDB);
 const userService = new UserService(userSqlRepository, patientSqlRepository);
 const userController = new UserController(userService);
 
-jest.mock('../api/auth/service/user-service.js');
+jest.mock('../service/user-service.js');
 
 describe('user controller unit test', () => {
   const registrationData = {

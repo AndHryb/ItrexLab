@@ -98,7 +98,7 @@ window.addEventListener('load', async () => {
   try {
     const UserResponse = await authClient.client.get('/auth/username');
     const userData = await UserResponse.data;
-    accountName.textContent = userData.patient.name;
+    accountName.textContent = userData.name;
   } catch (err) {
     console.log('Request failed', err);
   }

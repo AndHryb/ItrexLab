@@ -31,3 +31,8 @@ export const STATUSES = {
 
 const TTL = 15000000;
 export { TTL };
+
+export const USER_TYPE = {
+  PATIENT: 'patient',
+  DOCTOR: 'doctor',
+};

@@ -18,7 +18,6 @@ export default class ResolutionService {
       }
 
       const resolutionListTTL = resolutionList.filter((elem) => this.TTL > (new Date()).getTime() - (new Date(elem.createdAt)).getTime());
-      //проверить работает ли ттл без bind this
       return resolutionListTTL;
     } catch (err) {
       console.log(`Resolution service add error :${err.name} : ${err.message}`);

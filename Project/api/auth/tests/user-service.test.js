@@ -1,21 +1,26 @@
 import bcrypt from 'bcryptjs';
 import SequelizeMock from 'sequelize-mock';
 import jwt from 'jsonwebtoken';
-import UserService from '../api/auth/service/user-service.js';
-import UserSqlRepository from '../api/auth/repository/user-sql-repository.js';
-import PatientSqlRepository from '../api/patient/repository/patient-sql-repository.js';
-import decodeToken from '../helpers/decode-token.js';
+import UserService from '../service/user-service.js';
+import UserSqlRepository from '../repository/user-sql-repository.js';
+import PatientSqlRepository from '../../patient/repository/patient-sql-repository.js';
+import DoctorRepository from '../../doctor/repository/doctor.repository.js';
+// import decodeToken from '../../../helpers/decode-token.js';
+import checkJwtToken from '../../../helpers/decode-token.js';
 
 const patientsSQLDBMock = new SequelizeMock();
 const usersSQLDBMock = new SequelizeMock();
+const doctorSQLDBMock = new SequelizeMock();
 
 const patientSqlRepository = new PatientSqlRepository(patientsSQLDBMock);
 const userSqlRepository = new UserSqlRepository(usersSQLDBMock);
-const userService = new UserService(userSqlRepository, patientSqlRepository);
+const doctorSqlRepository = new DoctorRepository(doctorSQLDBMock);
+const userService = new UserService(userSqlRepository, patientSqlRepository, doctorSqlRepository);
 
-jest.mock('../api/auth/repository/user-sql-repository.js');
-jest.mock('../api/patient/repository/patient-sql-repository.js');
-jest.mock('../helpers/decode-token.js');
+jest.mock('../repository/user-sql-repository.js');
+jest.mock('../../patient/repository/patient-sql-repository.js');
+jest.mock('../../doctor/repository/doctor.repository.js');
+jest.mock('../../../helpers/decode-token.js');
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 
@@ -44,13 +49,17 @@ describe('user service unit test', () => {
     createdAt: testTime,
     updatedAt: testTime,
   };
+  const payload = {
+    userId: '222',
+    role: 'patient',
+  };
 
   userService.getToken = jest.fn(() => 'valid_token_111');
 
   test('registration test', async () => {
     userSqlRepository.checkEmail.mockResolvedValue(false);
-    bcrypt.genSaltSync.mockResolvedValue(10);
-    bcrypt.hashSync.mockResolvedValue(1111);
+    //bcrypt.genSaltSync.mockResolvedValue(10);
+    //bcrypt.hashSync.mockResolvedValue(1111);
     userSqlRepository.add.mockResolvedValue(userData);
     patientSqlRepository.add.mockResolvedValue(patientData);
     const res = await userService.registration(regData);
@@ -67,7 +76,7 @@ describe('user service unit test', () => {
     userSqlRepository.checkEmail.mockResolvedValue(userData);
     bcrypt.compareSync.mockResolvedValue(true);
     const res = await userService.login(regData);
-    expect(res).toEqual({email: true, password: true, token: "valid_token_111"});
+    expect(res).toEqual({ email: true, password: true, token: 'valid_token_111' });
   });
 
   test('login, email doesn\'t match', async () => {
@@ -75,28 +84,29 @@ describe('user service unit test', () => {
     bcrypt.compareSync = jest.fn(() => true);
     jwt.sign.mockResolvedValue('111');
     const res = await userService.login(regData);
-    expect(res).toEqual({email: false, password: false, token: undefined});
+    expect(res).toEqual({ email: false, password: false, token: undefined });
   });
 
   test('login, password doesn\'t match', async () => {
     userSqlRepository.checkEmail.mockResolvedValue(userData);
     bcrypt.compareSync = jest.fn(() => false);
     const res = await userService.login(regData);
-    expect(res).toEqual({email: true, password: false, token: undefined});
+    expect(res).toEqual({ email: true, password: false, token: undefined });
   });
 
   test('get by token ', async () => {
-    decodeToken.mockResolvedValue(userData);
+    checkJwtToken.mockResolvedValue(payload);
+    //checkJwtToken = jest.fn( () => payload);
     patientSqlRepository.getByUserId.mockResolvedValue(patientData);
-    const res = await userService.getPatientByToken('111fff');
+    const res = await userService.getByToken('111fff');
     expect(res).toEqual(patientData);
   });
 
   test('get by token, id doesn\'t match', async () => {
-    decodeToken.mockResolvedValue(userData);
+    checkJwtToken.mockResolvedValue(userData);
     patientSqlRepository.getByUserId.mockResolvedValue(false);
-    const res = await userService.getPatientByToken('111fff');
-    expect(res).toEqual(false);
+    const res = await userService.getByToken('111fff');
+    expect(res).toEqual(undefined);
   });
 
   test('get by userId ', async () => {

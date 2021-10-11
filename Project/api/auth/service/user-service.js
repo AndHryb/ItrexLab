@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import decodeToken from '../../../helpers/decode-token.js';
-import checkJwtToken from '../../../helpers/decode-doctor-token.js';
-import { WRONG_EMAIL_MSG, WRONG_PASS_MSG } from '../../../constants.js';
+//import decodeToken from '../../../helpers/decode-token.js';
+import checkJwtToken from '../../../helpers/decode-token.js';
+import { WRONG_EMAIL_MSG, WRONG_PASS_MSG, USER_TYPE } from '../../../constants.js';
 
 export default class UserService {
-  constructor(userRepository, patientRepository,doctorRepository) {
+  constructor(userRepository, patientRepository, doctorRepository) {
     this.userRepository = userRepository;
     this.patientRepository = patientRepository;
     this.doctorRepository = doctorRepository;
@@ -35,6 +35,7 @@ export default class UserService {
       return this.getToken(user);
     } catch (err) {
       console.log(`User service registration error :${err.name} : ${err.message}`);
+      throw new Error(err);
     }
   }
 
@@ -64,33 +65,26 @@ export default class UserService {
     }
   }
 
-  async getPatientByToken(token) {
+  async getByToken(token) {
     try {
       if (!token) {
         return false;
       }
-      const decoded = decodeToken(token);
-      const { userId } = decoded;
-      const result = await this.patientRepository.getByUserId(userId);
+      const decoded = checkJwtToken(token);
+      const { userId, role } = decoded;
+      let result;
+      if (role == USER_TYPE.PATIENT) {
+        result = await this.patientRepository.getByUserId(userId);
+      } else {
+        result = await this.doctorRepository.getByUserId(userId);
+      }
+
       return result;
     } catch (err) {
       console.log(`User service getByPatientToken error :${err.name} : ${err.message}`);
     }
   }
 
-  async getDoctorByToken(token) {
-    try {
-      if (!token) {
-        return false;
-      }
-      const decoded = checkJwtToken(token);
-      const { userId } = decoded;
-      const result = await this.doctorRepository.getByUserId(userId);
-      return result;
-    } catch (err) {
-      console.log(`User service getDoctorByToken error :${err.name} : ${err.message}`);
-    }
-  }
 
   async getByUserId(userId) {
     try {

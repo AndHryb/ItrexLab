@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import Ajv from 'ajv';
+import * as cookie from 'cookie';
 import { __dirname } from '../main.js';
 import { injector } from '../injector.js';
 import { checkRegistrationFormShema } from '../helpers/validation-schems-ajv/checkRegistratioForm.js';
@@ -40,7 +41,10 @@ userRouter.post('/login/doctor', async (req, res, next) => {
 });
 
 userRouter.get('/username', async (req, res) => {
-  const result = await userController.getPatientByToken(req.headers.authorization);
+  const cookies = cookie.parse(req.headers.cookie);
+  const { token } = cookies;
+  const result = await userController.getByToken(token);
+ // const result = await userController.getByToken(req.headers.authorization);
   res.status(result.status).json(result.value);
 });
 

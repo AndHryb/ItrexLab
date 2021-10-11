@@ -1,11 +1,11 @@
 import SequelizeMock from 'sequelize-mock';
-import { STATUSES } from '../constants.js';
-import ResolutionController from '../api/resolution/controllers/resolution-controller.js';
-import ResolutionService from '../api/resolution/service/resolution-service.js';
-import DoctorService from '../api/doctor/service/doctor.service.js';
-import ResolutionSqlRepository from '../api/resolution/repository/resolution-sql-repository.js';
-import DoctorRepository from '../api/doctor/repository/doctor.repository.js';
-import checkJwtToken from '../helpers/decode-doctor-token.js';
+import { STATUSES } from '../../../constants.js';
+import ResolutionController from '../controllers/resolution-controller.js';
+import ResolutionService from '../service/resolution-service.js';
+import DoctorService from '../../doctor/service/doctor.service.js';
+import ResolutionSqlRepository from '../repository/resolution-sql-repository.js';
+import DoctorRepository from '../../doctor/repository/doctor.repository.js';
+import checkJwtToken from '../../../helpers/decode-token.js';
 
 const resolutionsSQLDB = new SequelizeMock();
 const doctorSQLDB = new SequelizeMock();
@@ -17,9 +17,9 @@ const resolutionService = new ResolutionService(resolutionSqlRepository);
 const doctorService = new DoctorService(doctorSQLRepository);
 const resolutionController = new ResolutionController(resolutionService, doctorService);
 
-jest.mock('../api/resolution/service/resolution-service.js');
-jest.mock('../api/doctor/service/doctor.service.js');
-jest.mock('../helpers/decode-doctor-token.js');
+jest.mock('../service/resolution-service.js');
+jest.mock('../../doctor/service/doctor.service.js');
+jest.mock('../../../helpers/decode-doctor-token.js');
 
 describe('resolution controller unit test', () => {
   let resolutionData1;

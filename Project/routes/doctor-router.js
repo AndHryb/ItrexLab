@@ -6,30 +6,18 @@ import { injector } from '../injector.js';
 import { STATUSES } from '../constants.js';
 import { checkResolutionSchema } from '../helpers/validation-schems-ajv/checkResolution.js';
 import { checkNameSchema } from '../helpers/validation-schems-ajv/checkName.js';
-import checkJwtToken from '../helpers/decode-doctor-token.js';
+import checkJwtToken from '../helpers/decode-token.js';
+import checkDoctorTocken from '../helpers/checkJwtDoctor.js';
 
 const __dirname = path.resolve();
 const doctorRouter = express.Router();
 const ajv = new Ajv();
 const resolutionController = injector.getResolutionController();
 const doctorController = injector.getDoctorController();
-const userController = injector.getUserController();
 
-doctorRouter.get('/', async (req, res, next) => {
-  const cookies = cookie.parse(req.headers.cookie);
-  const result = await userController.getDoctorByToken(cookies.doctorToken);
-  if (result.value.doctor) {
-    next();
-  } else {
-    res.redirect('/auth/doctor-login');
-  }
-}, (req, res) => {
+doctorRouter.get('/', checkDoctorTocken, (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static', 'doctor.html'));
 });
-
-// resolutionRouter.get('/', (req, res) => {
-//   res.sendFile(path.resolve(__dirname, 'static', 'doctor.html'));
-// });
 
 doctorRouter.post('/resolution', async (req, res, next) => {
   if (ajv.validate(checkResolutionSchema, req.body.value)) {
@@ -44,7 +32,9 @@ doctorRouter.post('/resolution', async (req, res, next) => {
 });
 
 doctorRouter.get('/resolution/me', async (req, res) => {
-  const result = await resolutionController.getResolutionByToken(req.headers.authorization);
+  const cookies = cookie.parse(req.headers.cookie);
+  const { token } = cookies;
+  const result = await resolutionController.getResolutionByToken(token);
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
 });

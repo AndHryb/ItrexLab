@@ -1,6 +1,6 @@
-import QueueService from '../api/queue/service/queue-service.js';
-import PatientSqlRepository from '../api/patient/repository/patient-sql-repository.js';
-import QueueRedisRepository from '../api/queue/repository/queue-redis-repository.js';
+import QueueService from '../service/queue-service.js';
+import PatientSqlRepository from '../../patient/repository/patient-sql-repository.js';
+import QueueRedisRepository from '../repository/queue-redis-repository.js';
 import SequelizeMock from 'sequelize-mock';
 import redis from 'redis-mock';
 
@@ -10,8 +10,8 @@ const patientSqlRepository = new PatientSqlRepository(patientsSQLDBMock);
 const queueRedisRepository = new QueueRedisRepository(client);
 const queueService = new QueueService(patientSqlRepository, queueRedisRepository);
 
-jest.mock('../api/patient/repository/patient-sql-repository.js');
-jest.mock('../api/queue/repository/queue-redis-repository.js');
+jest.mock('../../patient/repository/patient-sql-repository.js');
+jest.mock('../repository/queue-redis-repository.js');
 
 describe('queue service unit tests', () => {
   const patientName = 'Andrei';

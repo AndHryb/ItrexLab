@@ -1,14 +1,14 @@
 import redis from 'redis-mock';
 import SequelizeMock from 'sequelize-mock';
-import { STATUSES } from '../constants.js';
-import QueueController from '../api/queue/controllers/queue-controller.js';
-import QueueService from '../api/queue/service/queue-service.js';
-import UserService from '../api/auth/service/user-service.js';
-import DoctorService from '../api/doctor/service/doctor.service.js';
-import QueueRedisRepository from '../api/queue/repository/queue-redis-repository.js';
-import UserSqlRepository from '../api/auth/repository/user-sql-repository.js';
-import DoctorRepository from '../api/doctor/repository/doctor.repository.js';
-import checkJwtToken from '../helpers/decode-doctor-token.js';
+import { STATUSES } from '../../../constants.js';
+import QueueController from '../controllers/queue-controller.js';
+import QueueService from '../service/queue-service.js';
+import UserService from '../../auth/service/user-service.js';
+import DoctorService from '../../doctor/service/doctor.service.js';
+import QueueRedisRepository from '../repository/queue-redis-repository.js';
+import UserSqlRepository from '../../auth/repository/user-sql-repository.js';
+import DoctorRepository from '../../doctor/repository/doctor.repository.js';
+import checkJwtToken from '../../../helpers/decode-token.js';
 
 const usersSQLDB = new SequelizeMock();
 const doctorSQLDB = new SequelizeMock();
@@ -24,10 +24,10 @@ const doctorService = new DoctorService(doctorRepository);
 const userService = new UserService(userSqlRepository);
 const queueController = new QueueController(queueService, userService, doctorService);
 
-jest.mock('../api/auth/service/user-service.js');// UserService
-jest.mock('../api/queue/service/queue-service.js');// QueueService
-jest.mock('../api/doctor/service/doctor.service.js');// DoctorService
-jest.mock('../helpers/decode-doctor-token.js');// checkJwtToken
+jest.mock('../../auth/service/user-service.js');// UserService
+jest.mock('../service/queue-service.js');// QueueService
+jest.mock('../../doctor/service/doctor.service.js');// DoctorService
+jest.mock('../../../helpers/decode-doctor-token.js');// checkJwtToken
 
 
 const docData = { id: '444', name: 'Sergei' };

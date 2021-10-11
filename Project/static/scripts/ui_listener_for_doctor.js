@@ -61,7 +61,6 @@ nextBtnForDoctor.addEventListener('click', async () => {
   } catch (err) {
     console.log('Request failed', err);
   }
-
 });
 
 addBtnForResolution.addEventListener('click', async () => {
@@ -177,7 +176,7 @@ window.addEventListener('load', async () => {
         const opt = document.createElement('option');
         opt.innerHTML = elem.name;
         dropDownSpec.appendChild(opt);
-      })
+      });
       dropDownSpec.hidden = false;
     } else {
       spec = specialities[0].name;
@@ -185,4 +184,4 @@ window.addEventListener('load', async () => {
   } catch (err) {
     console.log(err);
   }
-})
+});

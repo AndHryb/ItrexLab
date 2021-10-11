@@ -6,36 +6,16 @@ import Ajv from 'ajv';
 import { injector } from '../injector.js';
 import { STATUSES } from '../constants.js';
 import { checkDocId } from '../helpers/validation-schems-ajv/checkName.js';
+import checkPatientToken from '../helpers/checkJwtPatient.js';
 
 const __dirname = path.resolve();
-const emitter = new events.EventEmitter();
 const patientRouter = express.Router();
 const queueController = injector.getQueueController();
-const userController = injector.getUserController();
 const ajv = new Ajv();
 
-patientRouter.get('/', async (req, res) => {
-  const cookies = cookie.parse(req.headers.cookie);
-  const { token } = cookies;
-  const checkToken = await userController.getPatientByToken(`Bearer ${token}`);
-
-  if (checkToken.value.patient) {
-    res.sendFile(path.resolve(__dirname, 'static', 'patient.html'));
-  } else {
-    res.sendFile(path.resolve(__dirname, 'static', 'login.html'));
-  }
+patientRouter.get('/', checkPatientToken, async (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'static', 'patient.html'));
 });
-
-// queueRouter.get('/connect', (req, res) => {
-//   res.writeHead(200, {
-//     Connection: 'keep-alive',
-//     'Content-Type': 'text/event-stream',
-//     'Cache-Control': 'no-cache',
-//   });
-//   emitter.on('next', (name) => {
-//     res.write(`data: ${JSON.stringify(name)} \n\n`);
-//   });
-// });
 
 patientRouter.get('/next-in-queue', async (req, res) => {
   const cookies = cookie.parse(req.headers.cookie);
@@ -45,7 +25,6 @@ patientRouter.get('/next-in-queue', async (req, res) => {
 
   res.set('Content-Type', 'application/json;charset=utf-8');
   res.status(result.status).json(result.value);
-  emitter.emit('next', result.value);
 });
 
 patientRouter.post('/in-queue', async (req, res, next) => {

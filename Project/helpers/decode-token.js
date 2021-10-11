@@ -1,8 +1,13 @@
 import jwt from 'jsonwebtoken';
 
-export default function decodeToken(token) {
-  const splitToken = token.split(' ');
-  const clearToken = splitToken[1];
-  const decoded = jwt.verify(clearToken, process.env.JWT_KEY);
-  return decoded;
+export default function checkJwtToken(token) {
+  const decodedToken = jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
+    if (err) {
+      throw err;
+    } else {
+      return decoded;
+    }
+  });
+
+  return decodedToken;
 }

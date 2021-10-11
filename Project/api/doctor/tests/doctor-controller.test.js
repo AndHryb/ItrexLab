@@ -1,6 +1,6 @@
-import DoctorController from '../api/doctor/controller/doctor.controller.js';
-import DoctorService from '../api/doctor/service/doctor.service.js';
-import { STATUSES, NO_DOC_MSG } from '../constants.js';
+import DoctorController from '../controller/doctor.controller.js';
+import DoctorService from '../service/doctor.service.js';
+import { STATUSES, NO_DOC_MSG } from '../../../constants.js';
 
 const doctorController = new DoctorController(new DoctorService());
 const doctorService = doctorController.service;

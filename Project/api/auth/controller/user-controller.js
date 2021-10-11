@@ -54,9 +54,9 @@ export default class UserController {
     return res;
   }
 
-  async getPatientByToken(token) {
+  async getByToken(token) {
     const res = new Request();
-    const result = await this.userService.getPatientByToken(token);
+    const result = await this.userService.getByToken(token);
     if (!result) {
       res.status = STATUSES.ServerError;
       res.value = {
@@ -64,29 +64,27 @@ export default class UserController {
       };
     }
     res.status = STATUSES.OK;
-    res.value = {
-      patient: result,
-    };
+    res.value = result;
 
     return res;
   }
 
-  async getDoctorByToken(token) {
-    const res = new Request();
-    const result = await this.userService.getDoctorByToken(token);
-    if (!result) {
-      res.status = STATUSES.ServerError;
-      res.value = {
-        message: 'Server Error.Try logging in again',
-      };
-    }
-    res.status = STATUSES.OK;
-    res.value = {
-      doctor: result,
-    };
-
-    return res;
-  }
+  // async getDoctorByToken(token) {
+  //   const res = new Request();
+  //   const result = await this.userService.getDoctorByToken(token);
+  //   if (!result) {
+  //     res.status = STATUSES.ServerError;
+  //     res.value = {
+  //       message: 'Server Error.Try logging in again',
+  //     };
+  //   }
+  //   res.status = STATUSES.OK;
+  //   res.value = {
+  //     doctor: result,
+  //   };
+  //
+  //   return res;
+  // }
 
   async doctorLogin(data) {
     const res = new Request();

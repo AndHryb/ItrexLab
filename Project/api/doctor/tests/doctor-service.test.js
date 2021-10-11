@@ -1,6 +1,6 @@
-import DoctorService from '../api/doctor/service/doctor.service.js';
-import DoctorRepository from '../api/doctor/repository/doctor.repository.js';
-import { STATUSES, NO_DOC_MSG } from '../constants.js';
+import DoctorService from '../service/doctor.service.js';
+import DoctorRepository from '../repository/doctor.repository.js';
+import { STATUSES, NO_DOC_MSG } from '../../../constants.js';
 
 const doctorService = new DoctorService(new DoctorRepository());
 const doctorRepository = doctorService.repository;

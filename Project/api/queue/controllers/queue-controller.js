@@ -1,6 +1,6 @@
 import { STATUSES, NO_PATIENT_MSG } from '../../../constants.js';
 import Request from '../../../helpers/request.js';
-import checkJwtToken from '../../../helpers/decode-doctor-token.js';
+import checkJwtToken from '../../../helpers/decode-token.js';
 
 export default class QueueController {
   constructor(queueService, userService, doctorService) {

@@ -1,11 +1,11 @@
 import redis from 'redis-mock';
 import SequelizeMock from 'sequelize-mock';
-import ResolutionService from '../api/resolution/service/resolution-service.js';
-import ResolutionSqlRepository from '../api/resolution/repository/resolution-sql-repository.js';
-import PatientSqlRepository from '../api/patient/repository/patient-sql-repository.js';
-import QueueRedisRepository from '../api/queue/repository/queue-redis-repository';
-import { TTL } from '../constants.js';
-import decodeToken from '../helpers/decode-token';
+import ResolutionService from '../service/resolution-service.js';
+import ResolutionSqlRepository from '../repository/resolution-sql-repository.js';
+import PatientSqlRepository from '../../patient/repository/patient-sql-repository.js';
+import QueueRedisRepository from '../../queue/repository/queue-redis-repository.js';
+import { TTL } from '../../../constants.js';
+import decodeToken from '../../../helpers/decode-token.js';
 
 const client = redis.createClient();
 const patientsSQLDBMock = new SequelizeMock();
@@ -16,10 +16,10 @@ const patientSqlRepository = new PatientSqlRepository(patientsSQLDBMock);
 const queueRedisRepository = new QueueRedisRepository(client);
 const resolutionService = new ResolutionService(queueRedisRepository, resolutionSqlRepository, patientSqlRepository, TTL);
 
-jest.mock('../api/resolution/repository/resolution-sql-repository.js');
-jest.mock('../api/patient/repository/patient-sql-repository.js');
-jest.mock('../api/queue/repository/queue-redis-repository');
-jest.mock('../helpers/decode-token');
+jest.mock('../repository/resolution-sql-repository.js');
+jest.mock('../../patient/repository/patient-sql-repository.js');
+jest.mock('../../queue/repository/queue-redis-repository.js');
+jest.mock('../../../helpers/decode-token.js');
 
 describe('resolution service unit test', () => {
   let dataValues;
@@ -103,7 +103,7 @@ describe('resolution service unit test', () => {
     expect(res[0].dataValues.gender).toBe('male');
     expect(res[0].dataValues.birthday).toBe('1993-02-19');
     expect(res[0].dataValues.userId).toBe('333');
-  });*/
+  }); */
   /*
   test('get resolutions by name out ttl', async () => {
     resolutionSqlRepository.getByName.mockResolvedValue(patientList1);
@@ -118,7 +118,7 @@ describe('resolution service unit test', () => {
       }],
     },
     ]);
-  });*/
+  }); */
 
   test('get resolutions by name (there is no match by name)', async () => {
     resolutionSqlRepository.getByName.mockResolvedValue([]);
@@ -172,7 +172,7 @@ describe('resolution service unit test', () => {
     resolutionSqlRepository.delete.mockResolvedValue(true);
     const res = await resolutionService.delete(resolutionId);
     expect(res).toEqual(true);
-  });*/
+  }); */
 
   test('delete resolution data(repository hasn\'t data)', async () => {
     resolutionSqlRepository.delete.mockResolvedValue(false);
