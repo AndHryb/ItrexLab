@@ -1,106 +1,100 @@
 import { STATUSES } from '../../../constants.js';
-import Request from '../../../helpers/request.js';
+import * as cookie from 'cookie';
 
 export default class UserController {
   constructor(userService) {
     this.userService = userService;
   }
 
-  async registration(data) {
-    const res = new Request();
-    const result = await this.userService.registration(data);
+  async checkDoctorToken(req, res, next) {
+    let checkToken;
+    if (req.headers.cookie) {
+      const cookies = cookie.parse(req.headers.cookie);
+      const { doctorToken } = cookies;
+      checkToken = await this.userService.getByToken(doctorToken);
+    }
+    if (checkToken) {
+      next();
+    } else {
+      res.redirect('/auth/doctor-login');
+    }
+  }
+
+  async checkPatientToken(req, res, next) {
+    let checkToken;
+    if (req.headers.cookie) {
+      const cookies = cookie.parse(req.headers.cookie);
+      const { token } = cookies;
+      checkToken = await this.userService.getByToken(token);
+    }
+    if (checkToken) {
+      next();
+    } else {
+      res.redirect('/auth/patient-login');
+    }
+  }
+
+  async registration(req, res) {
+    const result = await this.userService.registration(req.body);
 
     if (result) {
-      res.value = {
+      res.status(STATUSES.Created).json({
         message: 'The user has been successfully registered',
         token: result,
-      };
-      res.status = STATUSES.Created;
-
-      return res;
-    }
-    res.value = {
+      });
+    }else{
+      res.status(STATUSES.Conflict).json({
       message: 'Email address is exist',
-    };
-    res.status = STATUSES.Conflict;
-
-    return res;
+      })
+    }
+    
   }
 
-  async login(data) {
-    const res = new Request();
-    const result = await this.userService.login(data);
+  async login(req, res) {
+    const result = await this.userService.login(req.body);
     if (!result.email) {
-      res.status = STATUSES.Unauthorized;
-      res.value = {
+      res.status(STATUSES.Unauthorized).json({
         message: `the email ${data.email} was not found in the database`,
-      };
-      return res;
+      });
     }
     if (!result.password) {
-      res.status = STATUSES.Unauthorized;
-      res.value = {
+      res.status(STATUSES.Unauthorized).json({
         message: `the password for ${data.email}  don't match`,
-      };
-      return res;
+      });
     }
     if (result.token) {
-      res.status = STATUSES.OK;
-      res.value = {
-        message: 'OK',
+      res.status(STATUSES.OK).json({
+        message: 'login successful',
         token: result.token,
-      };
+      });
     }
-    return res;
   }
 
-  async getByToken(token) {
-    const res = new Request();
+
+  async getByToken(req, res) {
+    const cookies = cookie.parse(req.headers.cookie);
+    const { token } = cookies;
     const result = await this.userService.getByToken(token);
     if (!result) {
-      res.status = STATUSES.ServerError;
-      res.value = {
+      res.status(STATUSES.ServerError).json({
         message: 'Server Error.Try logging in again',
-      };
+      });
+  
     }
-    res.status = STATUSES.OK;
-    res.value = result;
+    res.status(STATUSES.OK).json(result);
+  };
 
-    return res;
-  }
 
-  // async getDoctorByToken(token) {
-  //   const res = new Request();
-  //   const result = await this.userService.getDoctorByToken(token);
-  //   if (!result) {
-  //     res.status = STATUSES.ServerError;
-  //     res.value = {
-  //       message: 'Server Error.Try logging in again',
-  //     };
-  //   }
-  //   res.status = STATUSES.OK;
-  //   res.value = {
-  //     doctor: result,
-  //   };
-  //
-  //   return res;
-  // }
-
-  async doctorLogin(data) {
-    const res = new Request();
+  async doctorLogin(req, res) {
     try {
-      const { email, password } = data;
+      const { email, password } = req.body;
       const result = await this.userService.doctorLogin(email, password);
-
-      res.status = STATUSES.OK;
-      res.value = result;
-
-      return res;
+      res.cookie('doctorToken', `${result}`, {
+        httpOnly: true,
+      });
+      res.status(STATUSES.OK).json(result);
     } catch (err) {
-      res.status = STATUSES.Unauthorized;
-      res.value = err.message;
-
-      return res;
-    }
-  }
+      res.status(STATUSES.Unauthorized).json(err.message); 
+    };
+  };
 }

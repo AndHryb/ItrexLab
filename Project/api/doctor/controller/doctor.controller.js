@@ -1,60 +1,35 @@
+import * as cookie from 'cookie';
 import { STATUSES } from '../../../constants.js';
 import Request from '../../../helpers/request.js';
+import checkJwtToken from '../../../helpers/decode-token.js';
 
 export default class DoctorController {
   constructor(service) {
     this.service = service;
   }
 
-  async getDoctors() {
-    const result = new Request();
+  async getDoctors(req, res) {
     try {
-      const res = await this.service.getDoctors();
-      result.status = STATUSES.OK;
-      result.value = res;
-      return result;
+      const result = await this.service.getDoctors();
+      res.status(STATUSES.OK).json(result)
     } catch (err) {
       console.log(err);
-      result.status = STATUSES.NoContent;
-      result.value = err;
-      return result;
+      res.status(STATUSES.NotFound).json(err);
     }
   }
 
-  async getByUserId(userId) {
+  async getSpecByUserId(req, res) {
     try {
-      const res = await this.service.getByUserId(userId);
-      return res;
+      const cookies = cookie.parse(req.headers.cookie);
+      const { doctorToken } = cookies;
+      const { userId } = checkJwtToken(doctorToken);
+      
+      const result = await this.service.getSpecByUserId(userId);
+      res.status(STATUSES.OK).json(result);
     } catch (err) {
       console.log(err);
-      return err;
+      res.status(STATUSES.NotFound).json(err);
     }
   }
 
-  async getSpec(docId) {
-    const result = new Request();
-    try {
-      const res = await this.service.getSpec(docId);
-      result.status = STATUSES.OK;
-      result.value = res.specialties;
-
-      return result;
-    } catch (err) {
-      console.log(err);
-      result.status = STATUSES.NotFound;
-      result.value = err;
-
-      return err;
-    }
-  }
-
-  async getById(id) {
-    try {
-      const res = await this.service.getById(id);
-      return res;
-    } catch (err) {
-      console.log(err);
-      return err;
-    }
-  }
 }

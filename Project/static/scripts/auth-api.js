@@ -20,7 +20,7 @@ class AuthApi {
 
   async login(formData) {
     try {
-      const { data } = await this.client.post('/auth/patient-login', formData);
+      const { data } = await this.client.post('/auth/login', formData);
       if (data.token) {
         this.token = `${(data.token).toString()}`;
         return data.message;

@@ -19,6 +19,13 @@ export default class DoctorService {
     return res;
   }
 
+  async getSpecByUserId(userId) {
+    const res = await this.repository.getSpecByUserId(userId);
+    if (!res) throw new Error(NO_DOC_MSG);
+
+    return res;
+  }
+
   async getSpec(docId) {
     const res = await this.repository.getSpec(docId);
     if (!res) throw new Error(NO_DOC_MSG);

@@ -29,41 +29,21 @@ userRouter.post('/login/doctor', async (req, res, next) => {
   if (ajv.validate(checkLoginFormShema, req.body)) {
     next();
   } else { res.status(STATUSES.BadRequest).json('Fill out the form with the correct data'); }
-}, async (req, res) => {
-  const result = await userController.doctorLogin(req.body);
-  if (result.status === 200) {
-    res.cookie('doctorToken', `${result.value}`, {
-      httpOnly: true,
-    });
-  }
+ }, userController.doctorLogin.bind(userController));
 
-  res.status(result.status).json(result.value);
-});
-
-userRouter.get('/username', async (req, res) => {
-  const cookies = cookie.parse(req.headers.cookie);
-  const { token } = cookies;
-  const result = await userController.getByToken(token);
- // const result = await userController.getByToken(req.headers.authorization);
-  res.status(result.status).json(result.value);
-});
+userRouter.get('/username',userController.getByToken.bind(userController)) 
 
 userRouter.post('/registration', async (req, res, next) => {
   if (ajv.validate(checkRegistrationFormShema, req.body)) {
     next();
   } else { res.status(STATUSES.BadRequest).json('Fill out the form with the correct data'); }
-}, async (req, res) => {
-  const result = await userController.registration(req.body);
-  res.status(result.status).json(result.value);
-});
+},userController.registration.bind(userController));
+
 
 userRouter.post('/login', async (req, res, next) => {
   if (ajv.validate(checkLoginFormShema, req.body)) {
     next();
   } else { res.status(STATUSES.BadRequest).json('Fill out the form with the correct data'); }
-}, async (req, res) => {
-  const result = await userController.login(req.body);
-  res.status(result.status).json(result.value);
-});
+}, userController.login.bind(userController));
 
 export default userRouter;

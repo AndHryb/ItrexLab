@@ -29,6 +29,25 @@ export default class DoctorRepository {
     return res;
   }
 
+  async getSpecByUserId(userId) {
+    const res = await this.specModel.findAll({
+      attributes: ['name', 'id'],
+      include:  [
+        {
+          model: this.docModel,
+          as: 'doctors',
+          attributes: ['name'],
+          where: {
+                userId,
+              },
+        },
+      ],
+
+    });
+  
+    return res;
+  }
+
   async getSpec(docId) {
     const res = await this.docModel.findOne({
       where: {
